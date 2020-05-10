@@ -27,7 +27,7 @@ module.exports = {
                   var newvalue = { $set: {modroles: currentModRoles } };  
                   dbInstance.collection("config").updateOne(myquery, newvalue, function(err, res) {
                     if (err) throw err;
-                    message.channel.send(`Successfully removed ${message.guild.roles.get(modRoleRemoving)} as a mod role.`);
+                    message.channel.send(`Successfully removed ${message.guild.roles.cache.get(modRoleRemoving)} as a mod role.`);
                     db.close();
                   });
                   return;

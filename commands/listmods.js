@@ -7,12 +7,13 @@ var currentModRoles;
 var currentRole;
 module.exports = {
     name: 'listmods',
-    description: `List current server mods. (Admin only)`,
+    description: `List current server mods. (Mod only)`,
     cooldown: 10,
     updatedb: true,
-    needsadmin: true,
+    needsmod: true,
     guildOnly: true,
     execute(message, args) {
+      if(message.guild.id == "625766896230334465"){
             MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function(err, db) {
                 if (err) throw err;
                 dbInstance = db.db(currentdb);
@@ -20,7 +21,7 @@ module.exports = {
                 const items = await dbInstance.collection('config').findOne({});
                 currentModRoles = items.modroles;
                 currentModRoles.forEach(element => {
-                  currentRole = message.guild.roles.get(element);
+                  currentRole = message.guild.roles.cache.get(element);
                     data += `${currentRole.members.map(m=>m.user)} - ${currentRole}\n`;
                   
                 });
@@ -33,6 +34,8 @@ module.exports = {
                   message.channel.send(modEmbed);
                   return;
           });
-
+        }else{
+          message.reply("you need to use this command in the AltStore Discord server.")
+        }
     },
 };

