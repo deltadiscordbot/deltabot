@@ -17,6 +17,7 @@ module.exports = {
         message.channel.messages.fetch({ limit: amount })
         .then(messages => {
             var botMessages = messages.filter(m => m.author.id === '708722716685107324');
+            message.delete();
             message.channel.bulkDelete(botMessages, true).catch(err => {
                 console.error(err);
                 message.channel.send('there was an error trying to prune messages in this channel!');
