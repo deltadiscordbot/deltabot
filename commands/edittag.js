@@ -6,6 +6,7 @@ module.exports = {
     usage: ['(tag name) (tag content)'],
     cooldown: 10,
     needsmod: true,
+    guildOnly: true,
     args: true,
     execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function(err, db) {

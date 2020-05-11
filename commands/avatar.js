@@ -11,8 +11,8 @@ module.exports = {
         var userID;
         if(args.length){
             user = message.mentions.users.first();
-            userID = message.mentions.users.first().id;
-            userAvatar = message.mentions.users.first().avatarURL();
+            userID = user.id;
+            userAvatar = user.avatarURL();
         }else{
             user = message.author;
             userID = message.author.id;
