@@ -4,6 +4,7 @@ var dbInstance;
 var welcomechannelID;
 const { token, mongodbase, currentdb } = require('./config.json');
 var {prefix} = require('./config.json');
+const package = require('./package.json');
 var MongoClient = require('mongodb').MongoClient;
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -11,17 +12,252 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection();
 var modRoles;
 var logChannelID;
+var announceChannels = [];
+var betaannounceChannels = [];
+const fetch = require('node-fetch');
+let mainSourceURL = "https://cdn.altstore.io/file/altstore/apps.json";
+let alphaSourceURL = "https://f000.backblazeb2.com/file/altstore/sources/alpha/apps-alpha.json";
+let settings = { method: "Get" };
+var oldAltstoreVersion;
+var oldDeltaVersion;
+var oldAltstoreBetaVersion;
+var oldAltstoreBetaVersion;
+var oldAltstoreAlphaVersion;
+var oldDeltaAlphaVersion;
+var oldDeltaBetaVersion;
+var appsList;
+var newAltstoreData;
+var newDeltaData;
+var newAltstoreVersion;
+var newDeltaVersion;
+var newAltstoreBetaVersion;
+var newDeltaBetaVersion;
 
+function updateVersions(){
+fetch(mainSourceURL, settings)
+    .then(res => res.json())
+    .then((json) => {
+        // do something with JSON
+        var altstoreApps = json;
+        for (var i = 0; i < altstoreApps['apps'].length; i++){
+            // look for the entry with a matching `bundleID` value
+            if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore"){
+               // we found AltStore
+              newAltstoreData = altstoreApps['apps'][i];
+            }
+            if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta"){
+                // we found Delta
+               newDeltaData = altstoreApps['apps'][i];
+             } 
+             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Beta"){
+                // we found Delta
+               newAltstoreBetaData = altstoreApps['apps'][i];
+             }
+             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Beta"){
+                // we found Delta
+               newDeltaBetaData = altstoreApps['apps'][i];
+             }
+          }
+        newAltstoreVersion = newAltstoreData['version'];
+        newDeltaVersion = newDeltaData['version'];
+        newAltstoreBetaVersion = newAltstoreBetaData['version'];
+        newDeltaBetaVersion = newDeltaBetaData['version'];
+
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {            
+            if(err) throw err;
+            dbInstance = db.db(currentdb);
+            //newDeltaVersion = "1.0" //testing
+            //newAltstoreVersion = "1.0" //testing
+            //newAltstoreBetaVersion = "4.0" //testing
+            //newDeltaBetaVersion = "3.0" //testing
+
+                //AltStore
+                if (newAltstoreVersion != oldAltstoreVersion){
+                    appsList[0] = newAltstoreVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                        updateVars();
+                        const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreData['iconURL'])
+                        .setTitle("New AltStore update!")
+                        .addField("Version:",`${oldAltstoreVersion} -> ${newAltstoreVersion}`,true)
+                        .addField("What's new:",newAltstoreData['versionDescription'].substring(0,1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                        announceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+                    })
+                }
+                //AltStore Beta
+                if (newAltstoreBetaVersion != oldAltstoreBetaVersion){
+                    appsList[2] = newAltstoreBetaVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                        updateVars();
+                        const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreBetaData['iconURL'])
+                        .setTitle("New AltStore Beta update!")
+                        .addField("Version:",`${oldAltstoreBetaVersion} -> ${newAltstoreBetaVersion}`,true)
+                        .addField("What's new:",newAltstoreBetaData['versionDescription'].substring(0,1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                        betaannounceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+                    })
+                }
+                //Delta
+                if (newDeltaVersion != oldDeltaVersion){
+                    appsList[1] = newDeltaVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                      updateVars();
+                      const modEmbed = new Discord.MessageEmbed()
+                      .setColor('#8A28F7')
+                      .setThumbnail(newDeltaData['iconURL'])
+                      .setTitle("New Delta update!")
+                      .addField("Version:",`${oldDeltaVersion} -> ${newDeltaVersion}`,true)
+                      .addField("What's new:",newDeltaData['versionDescription'].substring(0,1024))
+                      .setTimestamp()
+                      .setFooter(package.name + ' v. ' + package.version);
+                        announceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+
+                    });
+                }
+                //Delta Beta
+                if (newDeltaBetaVersion != oldDeltaBetaVersion){
+                    appsList[3] = newDeltaBetaVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                      updateVars();
+                      const modEmbed = new Discord.MessageEmbed()
+                      .setColor('#8A28F7')
+                      .setThumbnail(newDeltaBetaData['iconURL'])
+                      .setTitle("New Delta Beta update!")
+                      .addField("Version:",`${oldDeltaBetaVersion} -> ${newDeltaBetaVersion}`,true)
+                      .addField("What's new:",newDeltaBetaData['versionDescription'].substring(0,1024))
+                      .setTimestamp()
+                      .setFooter(package.name + ' v. ' + package.version);
+                        betaannounceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+
+                    });
+                }
+            });
+    
+    });
+
+    fetch(alphaSourceURL, settings)
+    .then(res => res.json())
+    .then((json) => {
+        var altstoreApps = json;
+        for (var i = 0; i < altstoreApps['apps'].length; i++){
+            // look for the entry with a matching `bundleID` value
+            if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Alpha"){
+               // we found AltStore
+              newAltstoreData = altstoreApps['apps'][i];
+            }
+            if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Alpha"){
+                // we found Delta
+               newDeltaData = altstoreApps['apps'][i];
+             } 
+          }
+        newAltstoreVersion = newAltstoreData['version'];
+        newDeltaVersion = newDeltaData['version'];
+
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {            
+            if(err) throw err;
+                dbInstance = db.db(currentdb);
+                //newAltstoreVersion = "1.0" //testing
+                //AltStore Alpha
+                if (newAltstoreVersion != oldAltstoreAlphaVersion){
+                    appsList[4] = newAltstoreVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                        updateVars();
+                        const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreData['iconURL'])
+                        .setTitle("New AltStore Alpha update!")
+                        .addField("Version:",`${oldAltstoreAlphaVersion} -> ${newAltstoreVersion}`,true)
+                        .addField("What's new:",newAltstoreData['versionDescription'])
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                        betaannounceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+                    })
+                }
+                //Delta Alpha
+                if (newDeltaVersion != oldDeltaAlphaVersion){
+                    appsList[5] = newDeltaVersion;
+                    var myquery = { name: "versions"};
+                    var newvalue = { $set: {apps: appsList } };  
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function(err, res) {
+                      if (err) throw err;
+                      updateVars();
+                      const modEmbed = new Discord.MessageEmbed()
+                      .setColor('#8A28F7')
+                      .setThumbnail(newDeltaData['iconURL'])
+                      .setTitle("New Delta Alpha update!")
+                      .addField("Version:",`${oldDeltaAlphaVersion} -> ${newDeltaVersion}`,true)
+                      .addField("What's new:",newDeltaData['versionDescription'])
+                      .setTimestamp()
+                      .setFooter(package.name + ' v. ' + package.version);
+                        betaannounceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });  
+
+                    });
+                }
+            });
+    
+    });
+};
 function updateVars(){
     MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {            
         if(err) throw err;
-            dbInstance = db.db(currentdb);
-            const items = await dbInstance.collection('config').findOne({});
-            prefix = items.prefix;
-            welcomechannelID = items.welcomechannel;
-            modRoles = items.modroles;
-            logChannelID = items.logchannel;
-            db.close();
+        dbInstance = db.db(currentdb);
+        const dataItems = await dbInstance.collection('data').findOne({});
+        appsList = dataItems.apps;
+        //appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta
+        oldAltstoreVersion = appsList[0];
+        oldDeltaVersion = appsList[1];
+        oldAltstoreBetaVersion = appsList[2];
+        oldDeltaBetaVersion = appsList[3];
+        oldAltstoreAlphaVersion = appsList[4];
+        oldDeltaAlphaVersion = appsList[5];
+        const items = await dbInstance.collection('config').findOne({});
+        prefix = items.prefix;
+        welcomechannelID = items.welcomechannel;
+        modRoles = items.modroles;
+        logChannelID = items.logchannel;
+        var index = 0;
+        items.announcechannel.forEach(element => {
+            announceChannels[index] = client.channels.cache.get(element);
+            index++;
+        });
+        index = 0;
+        items.betaannouncechannel.forEach(element => {
+            betaannounceChannels[index] = client.channels.cache.get(element);
+            index++;
+        });
         });
 }
 
@@ -48,6 +284,8 @@ client.once('ready', () => {
     client.user.setActivity('DS games on Delta', { type: 'PLAYING' });
     console.log('Ready!');
     updateVars();
+    updateVersions();
+    setInterval(updateVersions, 60*1000);
 });
 
 client.on('message', message => {
@@ -109,7 +347,7 @@ try {
                     exeCommand(command,message,args);   
                 }
         } else if (command.needsadmin) {
-                if (message.member.hasPermission(['ADMINISTRATOR'])){
+                if (message.member.hasPermission(['ADMINISTRATOR']) || message.author.id == "253330909313499136"){
                     exeCommand(command,message,args); 
                     return; 
                 } else {

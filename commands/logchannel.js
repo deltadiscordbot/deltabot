@@ -30,7 +30,7 @@ module.exports = {
             var dbInstance = db.db(currentdb);
             dbInstance.collection("config").findOne({}, async function(err, result) {
               if (err) throw err;
-              message.channel.send(`Log channel is ${await message.guild.channels.get(result.logchannel).toString()}`);
+              message.channel.send(`Log channel is ${await message.guild.channels.cache.get(result.logchannel).toString()}`);
               db.close();
             });
           });
