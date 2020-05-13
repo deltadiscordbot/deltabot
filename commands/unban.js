@@ -17,7 +17,7 @@ module.exports = {
          * Unban the member
          */
         args.shift();
-        message.guild.unban(user, args.join(" ") + " Unbanned by: " + message.author.tag).then(() => {
+        message.guild.members.unban(user, args.join(" ") + " Unbanned by: " + message.author.tag).then(() => {
           // We let the message author know we were able to kick the person
           message.reply(`Successfully unbanned ${user}`);
         }).catch(err => {

@@ -2,7 +2,7 @@ module.exports = {
     name: 'ban',
     description: 'Bans a user. (Mod only)',
     guildOnly: true,
-    usage: '[user]',
+    usage: '[user] or [user ID]',
     args: true,
     needsmod: true,
     execute(message, args) {
@@ -44,12 +44,12 @@ module.exports = {
     } else if (args.length) {
       user = args[0];
       args.shift();
-      message.guild.ban(user,args.join(" ") + " Banned by: " + message.author.tag).then(() => {
-        // We let the message author know we were able to kick the person
+      message.guild.members.ban(user,args.join(" ") + " Banned by: " + message.author.tag).then(() => {
+        // We let the message author know we were able to ban the person
         message.reply(`Successfully banned ${user}`);
       }).catch(err => {
         // An error happened
-        // This is generally due to the bot not being able to kick the member,
+        // This is generally due to the bot not being able to ban the member,
         // either due to missing permissions or role hierarchy
         message.reply('I was unable to ban the user');
         // Log the error
