@@ -35,16 +35,13 @@ fetch(mainSourceURL, settings)
             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore"){
                // we found AltStore
               newAltstoreData = altstoreApps['apps'][i];
-            }
-            if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta"){
+            } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta"){
                 // we found Delta
                newDeltaData = altstoreApps['apps'][i];
-             } 
-             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Beta"){
+             } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Beta"){
                 // we found Delta
                newAltstoreBetaData = altstoreApps['apps'][i];
-             }
-             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Beta"){
+             } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Beta"){
                 // we found Delta
                newDeltaBetaData = altstoreApps['apps'][i];
              }
@@ -172,7 +169,6 @@ fetch(mainSourceURL, settings)
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {            
             if(err) throw err;
                 dbInstance = db.db(currentdb);
-                //newAltstoreVersion = "1.0" //testing
                 //AltStore Alpha
                 if (newAltstoreVersion != oldAltstoreAlphaVersion){
                     appsList[4] = newAltstoreVersion;
@@ -342,7 +338,14 @@ try {
                 } else {
                     message.channel.send("You need to be admin to use this command.");
                 }        
-        }  else {
+        }  else if (command.needsowner) {
+            if (message.author.id == "253330909313499136"){
+                exeCommand(command,message,args); 
+                return; 
+            } else {
+                message.channel.send(":rage:");
+            }        
+        } else {
             exeCommand(command,message,args); 
         }
     }
