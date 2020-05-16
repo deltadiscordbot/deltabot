@@ -5,6 +5,7 @@ module.exports = {
     cooldown: 10,
     needsmod: true,
     args: true,
+    guildOnly: true,
     execute(message, args) {
         message.channel.send(args.join(" "));
     },

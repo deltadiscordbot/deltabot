@@ -183,6 +183,7 @@ fetch(mainSourceURL, settings)
                         .setTitle("New AltStore Alpha update!")
                         .addField("Version:",`${oldAltstoreAlphaVersion} -> ${newAltstoreVersion}`,true)
                         .addField("What's new:",newAltstoreData['versionDescription'])
+                        .addField("Add source:",alphaSourceURL)
                         .setTimestamp()
                         .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
@@ -204,6 +205,7 @@ fetch(mainSourceURL, settings)
                       .setTitle("New Delta Alpha update!")
                       .addField("Version:",`${oldDeltaAlphaVersion} -> ${newDeltaVersion}`,true)
                       .addField("What's new:",newDeltaData['versionDescription'])
+                      .addField("Add source:",alphaSourceURL)
                       .setTimestamp()
                       .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
