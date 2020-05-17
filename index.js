@@ -15,9 +15,9 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const cooldowns = new Discord.Collection();
 let announceChannels = [];
 let betaannounceChannels = [];
-let settings = { method: "Get" };
+const settings = { method: "Get" };
 let modRoles,logChannelID,oldAltstoreVersion,oldDeltaVersion,oldAltstoreBetaVersion,oldAltstoreAlphaVersion,oldDeltaAlphaVersion,oldDeltaBetaVersion,appsList,newAltstoreData,newDeltaData,newAltstoreVersion,newDeltaVersion,newAltstoreBetaVersion,newDeltaBetaVersion;
-var consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
+const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 
 function updateVersions(){
 fetch(mainSourceURL, settings)
