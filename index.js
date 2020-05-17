@@ -361,24 +361,22 @@ catch (error) {
 
 //Join message
 client.on('guildMemberAdd', member => {
-    // Send the message to a designated channel on a server:
-    const channel = member.guild.channels.cache.get(welcomechannelID);
-    let logchannel = member.guild.channels.cache.get(logChannelID);
+    // AltStore Discord
+    let channel;
+    if (member.guild.id == "625766896230334465"){
+        channel = member.guild.channels.cache.get(welcomechannelID);
+    } else if (member.guild.id == "625714187078860810"){ //Delta Discord
+        channel = member.guild.channels.cache.get(welcomechannelID);
+    }
     // Do nothing if the channel wasn't found on this server
     if (!channel) return;
-    if (!logchannel) return;
 
     // Send the message, mentioning the member
-    channel.send(`Welcome to the server, ${member}`);
+    channel.send(`Welcome to the server, ${member}! Please read the info below.`);
     const modEmbed = new Discord.MessageEmbed()
                 .setColor('#32CD32')
                 .setTitle("Member Joined")
-                .setAuthor(member.user.tag,member.user.avatarURL())
-                .addField("Joined at:",member.joinedAt.toDateString() + ", " + member.joinedAt.toLocaleTimeString('en-US'))
-                .addField("User created:",member.user.createdAt.toDateString() + ", " + member.user.createdAt.toLocaleTimeString('en-US'))
-                .setTimestamp()
-                .setFooter(`User ID: ${member.user.id}`)
-                  logchannel.send(modEmbed);
+                channel.send(modEmbed);
   });
 
 //Deleted message

@@ -8,13 +8,6 @@ module.exports = {
     needsclient: true,
     needsowner:true,
     execute(message, args, client) {
-        const modEmbed = new Discord.MessageEmbed()
-        .setColor('#018084')
-        .setTitle("New AltStore Alpha update!")
-        .addField("Add source:","https://www.google.com")
-        .setTimestamp()
-        .setFooter(package.name + ' v. ' + package.version);
-        
-            message.channel.send(modEmbed);
+        message.reply(client.channels.cache.get(args[0]));
 },
 };
