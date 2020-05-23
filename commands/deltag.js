@@ -4,6 +4,7 @@ module.exports = {
     name: 'deltag',
     description: 'Removes a help tag. (Mod only)',
     usage: ['(tag name)'],
+    aliases: ['deletetag'],
     cooldown: 10,
     needsmod: true,
     guildOnly: true,

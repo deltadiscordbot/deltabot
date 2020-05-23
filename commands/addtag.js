@@ -6,6 +6,7 @@ module.exports = {
     name: 'addtag',
     description: 'Add a help tag. (Mod only)',
     usage: ['(tag name) (tag content)'],
+    aliases: ['createtag'],
     cooldown: 10,
     needsmod: true,
     guildOnly: true,

@@ -5,6 +5,7 @@ module.exports = {
     description: 'Edits a help tag. (Mod only)',
     usage: ['(tag name) (tag content)'],
     cooldown: 10,
+    aliases: ['changetag'],
     needsmod: true,
     guildOnly: true,
     args: true,

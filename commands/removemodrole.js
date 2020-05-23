@@ -9,6 +9,7 @@ module.exports = {
     description: `Removes a role as a moderator for ${package.name} (Admin only)`,
     usage: ['[role]'],
     cooldown: 10,
+    aliases: ['deletemodrole'],
     updatedb: true,
     guildOnly: true,
     needsadmin: true,
