@@ -4,11 +4,10 @@ const settings = { method: "Get" };
 let sourceApps = [];
 let embedInfo = "";
 module.exports = {
-    name: 'test',
-    description: 'Used for internal testing.',
+    name: 'source',
+    description: 'Lists apps from a source.',
     cooldown: 3,
     args: true,
-    needsowner: true,
     async execute(message, args) {
         sourceApps = [];
         if (args.length == 1){

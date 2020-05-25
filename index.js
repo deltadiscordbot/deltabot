@@ -16,6 +16,7 @@ const cooldowns = new Discord.Collection();
 let announceChannels = [];
 let betaannounceChannels = [];
 const settings = { method: "Get" };
+let altstoreApps;
 let modRoles,logChannelID,oldAltstoreVersion,oldDeltaVersion,oldAltstoreBetaVersion,oldAltstoreAlphaVersion,oldDeltaAlphaVersion,oldDeltaBetaVersion,appsList,newAltstoreData,newDeltaData,newAltstoreVersion,newDeltaVersion,newAltstoreBetaVersion,newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 
@@ -29,7 +30,7 @@ fetch(mainSourceURL, settings)
         client.user.setActivity(randomActivity + ` with ${client.users.cache.size} others!`, { type: 'PLAYING' });
 
         // do something with JSON
-        var altstoreApps = json;
+        altstoreApps = json;
         for (var i = 0; i < altstoreApps['apps'].length; i++){
             // look for the entry with a matching `bundleID` value
             if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore"){
