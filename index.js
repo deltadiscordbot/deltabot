@@ -7,8 +7,6 @@ const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const { token, mongodbase, currentdb } = require('./config.json');
 require('log-timestamp')(function() { return new Date().toLocaleString() + ' "%s"' });
-let dbInstance;
-let welcomechannelID;
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -16,8 +14,7 @@ const cooldowns = new Discord.Collection();
 let announceChannels = [];
 let betaannounceChannels = [];
 const settings = { method: "Get" };
-let altstoreApps;
-let modRoles,logChannelID,oldAltstoreVersion,oldDeltaVersion,oldAltstoreBetaVersion,oldAltstoreAlphaVersion,oldDeltaAlphaVersion,oldDeltaBetaVersion,appsList,newAltstoreData,newDeltaData,newAltstoreVersion,newDeltaVersion,newAltstoreBetaVersion,newDeltaBetaVersion;
+let altstoreApps,dbInstance,welcomechannelID,modRoles,logChannelID,oldAltstoreVersion,oldDeltaVersion,oldAltstoreBetaVersion,oldAltstoreAlphaVersion,oldDeltaAlphaVersion,oldDeltaBetaVersion,appsList,newAltstoreData,newDeltaData,newAltstoreVersion,newDeltaVersion,newAltstoreBetaVersion,newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 
 function updateVersions(){
