@@ -8,7 +8,7 @@ module.exports = {
     name: 'source',
     description: 'Displays apps from a source.',
     usage: "(SourceURL)",
-    cooldown: 3,
+    cooldown: 30,
     args: true,
     needsclient:true,
     async execute(message, args,client) {
@@ -59,6 +59,7 @@ module.exports = {
                     .setThumbnail(selcetedApp.iconURL)
                     .setURL(selcetedApp.downloadURL)
                     .setDescription(selcetedApp.localizedDescription.substring(0,2048))
+                    .addField("Source:",`[${json.name}](${args[0]})`)
                     .addField("Version:", selcetedApp.version,true)
                     .addField("Size:",formatBytes(selcetedApp.size),true)
                     .addField("What's new:",selcetedApp.versionDescription.substring(0,1024))

@@ -13,7 +13,7 @@ var memberObject;
 module.exports = {
     name: 'whois',
     description: `Shows information about a user`,
-    cooldown: 10,
+    cooldown: 30,
     updatedb: true,
     guildOnly: true,
     aliases: ['lookup'],

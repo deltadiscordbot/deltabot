@@ -5,7 +5,7 @@ module.exports = {
     description: `Gives information about ${package.name}.`,
     guildOnly: true,
     aliases: ['stats'],
-    cooldown: 10,
+    cooldown: 30,
     needsclient: true,
     execute(message, args, client) {
     const exampleEmbed = new Discord.MessageEmbed()

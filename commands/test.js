@@ -6,8 +6,7 @@ let embedInfo = "";
 let index = 1;
 module.exports = {
     name: 'test',
-    description: 'Used for internal testing.',
-    cooldown: 3,
+    description: 'Used for internal testing. (Owner only)',
     args: true,
     needsowner: true,
     needsclient:true,

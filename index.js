@@ -307,7 +307,9 @@ client.on('message', message => {
 		return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
 	}
     }
-
+    timestamps.set(message.author.id, now);
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+    
 try {
     if (command.guildOnly && message.channel.type !== 'text') {
         return message.reply('I can\'t execute that command inside DMs!');

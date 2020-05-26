@@ -3,7 +3,7 @@ const client = new Discord.Client();
 module.exports = {
     name: 'ping',
     description: 'Ping!',
-    cooldown: 3,
+    cooldown: 5,
     needsclient: true,
     async execute(message, args,client) {
 
