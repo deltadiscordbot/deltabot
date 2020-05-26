@@ -8,7 +8,7 @@ module.exports = {
     cooldown: 30,
     needsclient: true,
     execute(message, args, client) {
-    const exampleEmbed = new Discord.MessageEmbed()
+    const infoEmbed = new Discord.MessageEmbed()
 	.setColor('#32CD32')
     .setTitle(package.name)
     .setURL("https://github.com/deltadiscordbot/deltabot")
@@ -22,6 +22,6 @@ module.exports = {
 	.setTimestamp()
 	.setFooter('Requested by: ' + message.author.tag);
 
-    message.channel.send(exampleEmbed);
+    message.channel.send(infoEmbed);
     },
 };

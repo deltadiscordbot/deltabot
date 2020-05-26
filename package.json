@@ -8,7 +8,9 @@
     "log-timestamp": "^0.3.0",
     "mongod": "^2.0.0",
     "mongodb": "^3.5.7",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "pm2": "^4.4.0",
+    "translate": "^1.1.2"
   },
   "devDependencies": {},
   "scripts": {

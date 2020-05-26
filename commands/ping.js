@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 module.exports = {
     name: 'ping',
-    description: 'Ping!',
+    description: 'pong!',
     cooldown: 5,
     needsclient: true,
     async execute(message, args,client) {

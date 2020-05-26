@@ -18,20 +18,28 @@ module.exports = {
                 prefix = await items.prefix;
                 db.close();
             });
-        const data = [];
         const { commands } = message.client;
-        var currentString = '';
+        let currentString = '';
+        let modString = '';
+        let adminString = '';
 		if (!args.length) {
             for (let elem of commands.entries()){
+                if (elem[1].description.includes("Mod only")){
+                    modString = modString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                } else if (elem[1].description.includes("Admin only") || elem[1].description.includes("Owner only")){
+                adminString = adminString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+            } else {
                 currentString = currentString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
             }
-            currentString = currentString + `\n\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`;
-        data.push(currentString);
+        }
+        adminString = adminString + `\n\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`;
 
         const helpEmbed = new Discord.MessageEmbed()
-        .setColor('#32CD32')
+        .setColor('#8A28F7')
         .setTitle("Here\'s a list of all my commands:")
-        .setDescription(data)
+        .addField("Commands:",currentString)
+        .addField("Mod commands:",modString)
+        .addField("Admin commands:",adminString)
         .setTimestamp()
         .setFooter(package.name + ' v. ' + package.version);
 
@@ -54,7 +62,7 @@ const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.
 if (!command) {
     return message.reply('that\'s not a valid command!');
 }
-
+const data = [];
 data.push(`**Name:** ${command.name}`);
 
 if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
