@@ -11,6 +11,7 @@ module.exports = {
     cooldown: 30,
     args: true,
     needsclient:true,
+    guildOnly: true,
     async execute(message, args,client) {
         sourceApps = [];
         if (args.length == 1){
@@ -24,9 +25,9 @@ module.exports = {
                 index = 1;
                 sourceApps.forEach(element => {
                     if (element['beta']){
-                        embedInfo += `${index}. [**${element['name']}**](${element['downloadURL']}) *beta* ${element['version']} \n`
+                        embedInfo += `${index}. [**${element['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${element['downloadURL']}) *beta* ${element['version']} \n`
                     }else {
-                        embedInfo += `${index}. [**${element['name']}**](${element['downloadURL']}) ${element['version']} \n`
+                        embedInfo += `${index}. [**${element['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${element['downloadURL']}) ${element['version']} \n`
                     }
                     index++;
                 });
@@ -57,11 +58,10 @@ module.exports = {
                     .setAuthor(selcetedApp.developerName)
                     .setColor(selcetedApp.tintColor)
                     .setThumbnail(selcetedApp.iconURL)
-                    .setURL(selcetedApp.downloadURL)
                     .setDescription(selcetedApp.localizedDescription.substring(0,2048))
-                    .addField("Source:",`[${json.name}](${args[0]})`)
                     .addField("Version:", selcetedApp.version,true)
                     .addField("Size:",formatBytes(selcetedApp.size),true)
+                    .addField("Download:",`[Direct install](https://delta-skins.github.io/appinstall.html?altstore://install?url=${selcetedApp.downloadURL})\n[Download IPA](${selcetedApp.downloadURL})`,true)
                     .addField("What's new:",selcetedApp.versionDescription.substring(0,1024))
                     .setImage(selcetedApp.screenshotURLs[0])
                     .setTimestamp()

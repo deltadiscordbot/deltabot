@@ -7,6 +7,7 @@ module.exports = {
     description: 'Commands to provide help.',
     usage: ['(tag name)'],
     cooldown: 10,
+    guildOnly: true,
     execute(message, args) {
     if(args.length){
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function(err, db) {
@@ -40,7 +41,7 @@ module.exports = {
                     }
                 });
                 const modEmbed = new Discord.MessageEmbed()
-                .setColor('#32CD32')
+                .setColor('#8A28F7')
                 .setTitle("Current tags:")
                 .setDescription(data)
                 .setTimestamp()

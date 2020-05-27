@@ -6,6 +6,7 @@ module.exports = {
 	description: 'Translates text from Spanish to English.',
 	args: true,
 	aliases: ['tr'],
+    guildOnly: true,
 	async execute(message, args) {
 		translate.engine = 'yandex';
 		translate.key = translateAPI;
