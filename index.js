@@ -34,13 +34,13 @@ function updateVersions() {
                     // we found AltStore
                     newAltstoreData = altstoreApps['apps'][i];
                 } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta") {
-                    // we found Delta
+                    // we found delta
                     newDeltaData = altstoreApps['apps'][i];
                 } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Beta") {
-                    // we found Delta
+                    // we found altstore beta
                     newAltstoreBetaData = altstoreApps['apps'][i];
                 } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Beta") {
-                    // we found Delta
+                    // we found Delta beta
                     newDeltaBetaData = altstoreApps['apps'][i];
                 }
             }
@@ -153,11 +153,11 @@ function updateVersions() {
             for (var i = 0; i < altstoreApps['apps'].length; i++) {
                 // look for the entry with a matching `bundleID` value
                 if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Alpha") {
-                    // we found AltStore
+                    // we found AltStore alpha
                     newAltstoreData = altstoreApps['apps'][i];
                 }
                 if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Alpha") {
-                    // we found Delta
+                    // we found Delta alpha
                     newDeltaData = altstoreApps['apps'][i];
                 }
             }
