@@ -5,7 +5,7 @@ module.exports = {
 	name: 'slots',
 	description: 'Play slots. Default bet is 100.',
 	guildOnly: true,
-	cooldown: 5,
+	cooldown: 3,
 	usage: ['[bet]'],
 	aliases: ['spin'],
 	execute(message, args) {
@@ -67,8 +67,6 @@ module.exports = {
 						.setFooter(message.author.tag)
 					message.channel.send(slotMachine)
 						.then(msg => {
-							pointlessSlots(msg);
-							pointlessSlots(msg);
 							pointlessSlots(msg);
 							setTimeout(function () {
 								genSlots();
