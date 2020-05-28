@@ -1,0 +1,10 @@
+{
+    "prefix": "!",
+    "token":"token",
+    "mongodbase": "mongodb://localhost:27017",
+    "currentdb": "deltabot",
+    "mainSourceURL": "url",
+    "alphaSourceURL": "url",
+    "translateAPI": "translateAPI",
+    "ownerID": "ownerID"
+}
