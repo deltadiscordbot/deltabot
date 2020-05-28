@@ -1,15 +1,15 @@
 
 module.exports = {
-    name: 'kick',
-    description: 'Kicks a user. (Mod only)',
-    guildOnly: true,
-    usage: '[user]',
-    args: true,
-    needsmod: true,
-    execute(message, args) {
-        // Ignore messages that aren't from a guild
-  if (!message.guild) return;
-  
+  name: 'kick',
+  description: 'Kicks a user. (Mod only)',
+  guildOnly: true,
+  usage: '[user]',
+  args: true,
+  needsmod: true,
+  execute(message, args) {
+    // Ignore messages that aren't from a guild
+    if (!message.guild) return;
+
     // Assuming we mention someone in the message, this will return the user
     // Read more about mentions over at https://discord.js.org/#/docs/main/stable/class/MessageMentions
     const user = message.mentions.users.first();
@@ -40,10 +40,10 @@ module.exports = {
         // The mentioned user isn't in this guild
         message.reply('That user isn\'t in this guild!');
       }
-    // Otherwise, if no user was mentioned
+      // Otherwise, if no user was mentioned
     } else {
       message.reply('You didn\'t mention the user to kick!');
     }
-  
-},
+
+  },
 }

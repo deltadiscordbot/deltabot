@@ -12,24 +12,24 @@ module.exports = {
     guildOnly: true,
     args: true,
     execute(message, args) {
-        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function(err, db) {
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
             if (err) throw err;
             var argsArray = Array.from(args);
             dbInstance = db.db(currentdb);
             var tagName = argsArray.shift();
-            const items = await dbInstance.collection("tags").findOne({name: tagName});
-            if (items==null){
-            var myobj = { name: tagName.toString(), content: argsArray.join(" ") };
-            dbInstance.collection("tags").insertOne(myobj, function(err, res) {
-              if (err) throw err;
-              message.reply(`tag ${tagName} was added.`)
-              db.close();
-            
-            });
-        }else{
-            message.reply("there is already a tag with that name.")
-        }
-          });
-          
+            const items = await dbInstance.collection("tags").findOne({ name: tagName });
+            if (items == null) {
+                var myobj = { name: tagName.toString(), content: argsArray.join(" ") };
+                dbInstance.collection("tags").insertOne(myobj, function (err, res) {
+                    if (err) throw err;
+                    message.reply(`tag ${tagName} was added.`)
+                    db.close();
+
+                });
+            } else {
+                message.reply("there is already a tag with that name.")
+            }
+        });
+
     },
 };

@@ -9,21 +9,21 @@ module.exports = {
         var userAvatar;
         var user;
         var userID;
-        if(args.length){
+        if (args.length) {
             user = message.mentions.users.first();
             userID = user.id;
             userAvatar = user.avatarURL();
-        }else{
+        } else {
             user = message.author;
             userID = message.author.id;
             userAvatar = message.author.avatarURL();
         }
         const modEmbed = new Discord.MessageEmbed()
-                .setColor('#32CD32')
-                .setTitle(user.tag)
-                .setImage(userAvatar)
-                .setTimestamp()
-                .setFooter(`Requested by: @${message.author.tag}`,userAvatar);
+            .setColor('#32CD32')
+            .setTitle(user.tag)
+            .setImage(userAvatar)
+            .setTimestamp()
+            .setFooter(`Requested by: @${message.author.tag}`, userAvatar);
         message.channel.send(modEmbed);
     },
 };

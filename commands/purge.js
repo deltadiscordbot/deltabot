@@ -17,7 +17,7 @@ module.exports = {
         }
         message.channel.bulkDelete(amount, true).catch(err => {
             console.error(err);
-	        message.channel.send('there was an error trying to prune messages in this channel!');
+            message.channel.send('there was an error trying to prune messages in this channel!');
         });
     },
 };

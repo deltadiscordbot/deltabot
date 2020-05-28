@@ -7,11 +7,11 @@ module.exports = {
     args: true,
     guildOnly: true,
     execute(message, args) {
-      message.guild.channels.cache.get(args[0]).messages.fetch(args[1])
-      .then(message2 => {
-          message.delete();
-          message2.delete();
-      })
-  .catch(console.error);
+        message.guild.channels.cache.get(args[0]).messages.fetch(args[1])
+            .then(message2 => {
+                message.delete();
+                message2.delete();
+            })
+            .catch(console.error);
     },
 };

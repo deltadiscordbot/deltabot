@@ -15,16 +15,16 @@ module.exports = {
             return message.reply('you need to input a number between 2 and 100.');
         }
         message.channel.messages.fetch({ limit: amount })
-        .then(messages => {
-            var botMessages = messages.filter(m => m.author.id === '708722716685107324');
-            message.delete();
-            message.channel.bulkDelete(botMessages, true).catch(err => {
-                console.error(err);
-                message.channel.send('there was an error trying to prune messages in this channel!');
-            });
-    
-        })
-        .catch(console.error);
+            .then(messages => {
+                var botMessages = messages.filter(m => m.author.id === '708722716685107324');
+                message.delete();
+                message.channel.bulkDelete(botMessages, true).catch(err => {
+                    console.error(err);
+                    message.channel.send('there was an error trying to prune messages in this channel!');
+                });
+
+            })
+            .catch(console.error);
 
     },
 };

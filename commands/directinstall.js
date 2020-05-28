@@ -8,8 +8,8 @@ module.exports = {
 	execute(message, args) {
 		message.delete();
 		const directInstall = new Discord.MessageEmbed()
-		.setTitle("Direct Install")
-		.setURL(`https://delta-skins.github.io/appinstall.html?altstore://install?url=${args[0]})`)
+			.setTitle("Direct Install")
+			.setURL(`https://delta-skins.github.io/appinstall.html?altstore://install?url=${args[0]})`)
 		message.channel.send(directInstall)
 	},
 };

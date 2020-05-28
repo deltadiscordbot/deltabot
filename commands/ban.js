@@ -1,18 +1,18 @@
 module.exports = {
-    name: 'ban',
-    description: 'Bans a user. (Mod only)',
-    guildOnly: true,
-    usage: '[user] or [user ID]',
-    args: true,
-    needsmod: true,
-    execute(message, args) {
-        // Ignore messages that aren't from a guild
-  if (!message.guild) return;
-  
+  name: 'ban',
+  description: 'Bans a user. (Mod only)',
+  guildOnly: true,
+  usage: '[user] or [user ID]',
+  args: true,
+  needsmod: true,
+  execute(message, args) {
+    // Ignore messages that aren't from a guild
+    if (!message.guild) return;
+
     // Assuming we mention someone in the message, this will return the user
     // Read more about mentions over at https://discord.js.org/#/docs/main/stable/class/MessageMentions
     var user = message.mentions.users.first();
-    
+
     // If we have a user mentioned
     if (user) {
       // Now we get the member from the user
@@ -40,11 +40,11 @@ module.exports = {
         // The mentioned user isn't in this guild
         message.reply('That user isn\'t in this guild! You can ban by ID with \`!ban [userID]\`');
       }
-    // Otherwise, if no user was mentioned
+      // Otherwise, if no user was mentioned
     } else if (args.length) {
       user = args[0];
       args.shift();
-      message.guild.members.ban(user,args.join(" ") + " Banned by: " + message.author.tag).then(() => {
+      message.guild.members.ban(user, args.join(" ") + " Banned by: " + message.author.tag).then(() => {
         // We let the message author know we were able to ban the person
         message.reply(`Successfully banned ${user}`);
       }).catch(err => {
@@ -58,6 +58,6 @@ module.exports = {
     } else {
       message.reply('You didn\'t mention the user to ban!');
     }
-  
-},
+
+  },
 }
