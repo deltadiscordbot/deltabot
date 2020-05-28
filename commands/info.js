@@ -9,7 +9,7 @@ module.exports = {
     needsclient: true,
     execute(message, args, client) {
     const infoEmbed = new Discord.MessageEmbed()
-	.setColor('#32CD32')
+	.setColor('#8A28F7')
     .setTitle(package.name)
     .setURL("https://github.com/deltadiscordbot/deltabot")
     .setThumbnail(client.user.avatarURL)
