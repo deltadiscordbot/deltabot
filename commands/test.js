@@ -9,6 +9,6 @@ module.exports = {
         const testEmbed = new Discord.MessageEmbed()
         .addField("Direct install:",`${args[0]}`)
         message.channel.send(testEmbed)
-    });
+
     },
 };

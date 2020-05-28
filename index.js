@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 let {prefix} = require('./config.json');
-const {mainSourceURL, alphaSourceURL} = require('./config.json');
+const {mainSourceURL, alphaSourceURL, ownerID} = require('./config.json');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
@@ -318,7 +318,7 @@ try {
     } else {
         if (command.needsmod) {
             var isMod = false;
-            if (message.author.id == "253330909313499136") {
+            if (message.author.id == ownerID) {
                 isMod = true;
             }
             modRoles.forEach(element => {
@@ -334,14 +334,14 @@ try {
                     exeCommand(command,message,args);   
                 }
         } else if (command.needsadmin) {
-                if (message.member.hasPermission(['ADMINISTRATOR']) || message.author.id == "253330909313499136"){
+                if (message.member.hasPermission(['ADMINISTRATOR']) || message.author.id == ownerID){
                     exeCommand(command,message,args); 
                     return; 
                 } else {
                     message.channel.send("You need to be admin to use this command.");
                 }        
         }  else if (command.needsowner) {
-            if (message.author.id == "253330909313499136"){
+            if (message.author.id == ownerID){
                 exeCommand(command,message,args); 
                 return; 
             } else {
