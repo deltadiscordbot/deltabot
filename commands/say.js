@@ -7,6 +7,7 @@ module.exports = {
     args: true,
     guildOnly: true,
     execute(message, args) {
+        message.delete();
         message.channel.send(args.join(" "));
     },
 };
