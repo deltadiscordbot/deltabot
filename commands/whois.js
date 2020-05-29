@@ -13,13 +13,17 @@ var memberObject;
 module.exports = {
   name: 'whois',
   description: `Shows information about a user`,
-  cooldown: 30,
+  cooldown: 10,
   updatedb: true,
   guildOnly: true,
   aliases: ['lookup'],
   execute(message, args) {
     if (args.length) {
-      userObject = message.mentions.users.first();
+      if (args[0] == "me"){
+        userObject = message.author;
+      } else{
+        userObject = message.mentions.users.first();
+      }
       memberObject = message.guild.member(userObject);
       username = userObject.tag;
       userAvatar = userObject.avatarURL();
@@ -49,14 +53,14 @@ module.exports = {
     }
     const modEmbed = new Discord.MessageEmbed()
       .setColor('#32CD32')
-      .setAuthor(username, userAvatar)
+      .setAuthor(username)
       .setThumbnail(userAvatar)
       .addField("User created:", userCreated, true)
       .addField("Joined server:", userJoinedServer, true)
       .addField("Join position:", userJoinPosition, true)
       .addField("User roles:", userRoles)
       .setTimestamp()
-      .setFooter(`ID: ${userID}`, userAvatar);
+      .setFooter(`ID: ${userID}`);
     message.channel.send(modEmbed);
   },
 };

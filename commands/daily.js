@@ -10,7 +10,7 @@ module.exports = {
 			dbInstance = db.db(currentdb);
 			const user = await dbInstance.collection("users").findOne({ id: message.author.id });
 			if (user == null) {
-				var myobj = { id: message.author.id, balance: 1000, dailytime: Date.now() };
+				var myobj = { id: message.author.id, name: message.author.tag, balance: 1000, dailytime: Date.now(), totalCredits: 1000, color: "#000000", slotsPlays: 0};
 				dbInstance.collection("users").insertOne(myobj, function (err, res) {
 					if (err) throw err;
 					message.reply(`account created. \`1000\` credits were added to your balance.`)
@@ -20,11 +20,12 @@ module.exports = {
 				const oneday = 60 * 60 * 24 * 1000
 				if ((Date.now() - user.dailytime) > oneday) {
 					let newbalance = user.balance + 1000;
+					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
-					const newvalues = { $set: { id: message.author.id, balance: newbalance, dailytime: Date.now() } };
+					const newvalues = { $set: { id: message.author.id, name: message.author.tag, balance: newbalance, dailytime: Date.now(), totalCredits: newTotal} };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
-						message.reply(`daily credits redeemed. \`1000\` credits have been added to your account. Your new balance is \`${newbalance}\``)
+						message.reply(`daily credits redeemed. \`1000\` credits have been added to your account. Your new balance is \`${newbalance}\`.`)
 					});
 				} else {
 					message.reply(`you need to wait another ${Math.floor((oneday - (Date.now() - user.dailytime) / (1000 * 60 * 60)) % 24)} hours before collecting your daily credits.`)

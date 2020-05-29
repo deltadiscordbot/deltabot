@@ -91,10 +91,11 @@ module.exports = {
 									.setFooter(message.author.tag)
 								msg.edit(slotMachine);
 								dbInstance = db.db(currentdb);
-								const newTotal = user.balance - bet + winnings;
-
+								const newBalance = user.balance - bet + winnings;
+								const newTotal = user.totalCredits + winnings;
+								const totalPlays = user.slotsPlays + 1;
 								const myobj = { id: message.author.id, balance: user.balance, dailytime: user.dailytime };
-								const newvalues = { $set: { id: message.author.id, balance: newTotal, lastWin: winnings } };
+								const newvalues = { $set: { id: message.author.id, balance: newBalance, lastWin: winnings, totalCredits: newTotal, slotsPlays: totalPlays} };
 								dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 									if (err) throw err;
 								});
