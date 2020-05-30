@@ -71,7 +71,6 @@ module.exports = {
                     let color;
                     let title;
                     function dealersTurn(msg) {
-                        console.log(dealerValues)
                         dealersHand = `${dealersHand} ${hit("d", dealersHand)}`
                         blackjackEmbed = new Discord.MessageEmbed()
                             .setTitle("Blackjack")
@@ -206,6 +205,10 @@ module.exports = {
                             }
                         })
                 } else {
+                    if(bet==0){
+                        message.reply("please bet more than 0.");
+                        return;
+                    }
                     message.reply("sorry, you do not have enough credits to make that bet.")
                 }
             }
