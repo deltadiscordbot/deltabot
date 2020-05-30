@@ -31,6 +31,7 @@ module.exports = {
                 const balance = user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 let lastWin = 0;
                 let blackjackPlays = 0;
+                let slotsPlays = 0;
                 let defaultBet = 100;
                 if (user.lastWin != undefined) {
                     lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -42,8 +43,9 @@ module.exports = {
                     defaultBet = user.defaultBet.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 const totalCredits = user.totalCredits.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const slotsPlays = user.slotsPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const profileEmbed = new Discord.MessageEmbed()
+                if (user.slotsPlays != undefined) {
+                    slotsPlays = user.slotsPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }                const profileEmbed = new Discord.MessageEmbed()
                     .setAuthor(mentionedUser.tag, mentionedUser.avatarURL())
                     .setColor(user.color)
                     .addField("Balance:", balance, true)

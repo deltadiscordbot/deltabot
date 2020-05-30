@@ -25,7 +25,7 @@ module.exports = {
 					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: Date.now(), totalCredits: newTotal } };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
-						message.reply(`daily credits redeemed. \`1,000\` credits have been added to your account. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
+						message.reply(`\`1,000\` daily credits redeemed. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
 					});
 				} else {
 					let timeLeft = `${Math.ceil((oneday - (Date.now() - user.dailytime) / (1000 * 60 * 60)) % 24)} hours`

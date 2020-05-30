@@ -32,7 +32,7 @@ module.exports = {
 				}
 				//Actual game
 				if (user.balance >= bet && bet > 0) {
-					const icons = ["🍊", "🍌", "🍉", "🍇", "🍓", "🍒", "🍑", "🍍"];
+					const icons = ["<:yoshiEyes:638396688217800723>","<:Delta:626618870865723412>","<:toonlink_thumbsup:636274276885987359>","<:thinkio:636273251689168896>","<:rileyHead:654001693603921961>","<:mario_peace:636273149960388630>","<:bluetoadohyeah:636273099603443725>","<:pikaWow:638396688226320415>"];
 					function randomSlots() {
 						return `${icons[Math.floor(Math.random() * icons.length)]}`
 					}
@@ -100,7 +100,7 @@ module.exports = {
 								if (winnings > 0) {
 									lastWin = winnings
 								}
-								if (user.slotsPlays) {
+								if (user.slotsPlays!=undefined) {
 									totalPlays = user.slotsPlays + 1;
 								}
 								const myobj = { id: message.author.id };
