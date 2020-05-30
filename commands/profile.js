@@ -31,11 +31,15 @@ module.exports = {
                 const balance = user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 let lastWin = 0;
                 let blackjackPlays = 0;
+                let defaultBet = 100;
                 if (user.lastWin != undefined) {
                     lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 if (user.blackjackPlays != undefined) {
                     blackjackPlays = user.blackjackPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+                if (user.defaultBet != undefined) {
+                    defaultBet = user.defaultBet.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 const totalCredits = user.totalCredits.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 const slotsPlays = user.slotsPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -43,7 +47,8 @@ module.exports = {
                     .setAuthor(mentionedUser.tag, mentionedUser.avatarURL())
                     .setColor(user.color)
                     .addField("Balance:", balance, true)
-                    .addField("Total Earnings:", totalCredits, true)
+                    .addField("Total earnings:", totalCredits, true)
+                    .addField("Default bet:", defaultBet, true)
                     .addField("Slots plays:", slotsPlays, true)
                     .addField("Blackjack plays:", blackjackPlays, true)
                     .addField("Last win:", lastWin, true)

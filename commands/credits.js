@@ -12,7 +12,7 @@ module.exports = {
 			dbInstance = db.db(currentdb);
 			const user = await dbInstance.collection("users").findOne({ id: message.mentions.users.first().id });
 			let balance = user.balance + parseFloat(args[1]);
-			var newvalues = { $set: { id: message.mentions.users.first().id, balance: balance } };
+			var newvalues = { $set: { balance: balance } };
 			const myobj = { id: message.mentions.users.first().id };
 
 			dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {

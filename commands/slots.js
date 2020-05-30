@@ -14,27 +14,29 @@ module.exports = {
 			let bet = 100;
 			let winnings = 0;
 			let leftMiddleRow, midMiddleRow, rightMiddleRow, slots, authorText;
-			if (args.length) {
-				if (isNaN(args[0])) {
-					message.reply("please make a valid bet.")
-					return;
-				} else {
-					bet = parseInt(args[0].replace(",", "."));
-				}
-			}
 			dbInstance = db.db(currentdb);
 			const user = await dbInstance.collection("users").findOne({ id: message.author.id });
 			if (user == null) {
 				message.reply(`you do not have an account. Do \`!daily\` to make one.`)
 				db.close();
 			} else {
+				if (args.length) {
+					if (isNaN(args[0])) {
+						message.reply("please make a valid bet.")
+						return;
+					} else {
+						bet = parseInt(args[0].replace(",", "."));
+					}
+				} else if (user.defaultBet) {
+					bet = parseInt(user.defaultBet.toString().replace(",", "."));
+				}
 				//Actual game
 				if (user.balance >= bet && bet > 0) {
 					const icons = ["🍊", "🍌", "🍉", "🍇", "🍓", "🍒", "🍑", "🍍"];
 					function randomSlots() {
 						return `${icons[Math.floor(Math.random() * icons.length)]}`
 					}
-					authorText = `${user.balance - bet}`;
+					authorText = `${(user.balance - bet).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 					function genSlots() {
 						let topRow = `${randomSlots()} ${randomSlots()} ${randomSlots()}`
 						leftMiddleRow = `${randomSlots()}`;
@@ -54,7 +56,7 @@ module.exports = {
 								.setTitle("🎰 Slots 🎰")
 								.addField("Current balance", authorText)
 								.setDescription(slots)
-								.setFooter(message.author.tag)
+								.setFooter(`Bet: ${bet} ${message.author.tag}`)
 							msg.edit(slotMachine);
 						}, timer);
 						timer += 1000;
@@ -64,7 +66,7 @@ module.exports = {
 						.setTitle("🎰 Slots 🎰")
 						.addField("Current balance", authorText)
 						.setDescription(slots)
-						.setFooter(message.author.tag)
+						.setFooter(`Bet: ${bet} ${message.author.tag}`)
 					message.channel.send(slotMachine)
 						.then(msg => {
 							pointlessSlots(msg);
@@ -79,7 +81,7 @@ module.exports = {
 								let color = "#ff0000"
 								let title = "Lose";
 								if (winnings > 0) {
-									authorText = `${user.balance - bet + winnings} +${winnings}`;
+									authorText = `${(user.balance - bet + winnings).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} +${winnings}`;
 									color = "#00ff00"
 									title = "WIN!";
 								}
@@ -88,14 +90,21 @@ module.exports = {
 									.setColor(color)
 									.addField("Current balance", authorText)
 									.setDescription(slots)
-									.setFooter(message.author.tag)
+									.setFooter(`Bet: ${bet} ${message.author.tag}`)
 								msg.edit(slotMachine);
 								dbInstance = db.db(currentdb);
 								const newBalance = user.balance - bet + winnings;
 								const newTotal = user.totalCredits + winnings;
-								const totalPlays = user.slotsPlays + 1;
+								let totalPlays = 0;
+								let lastWin = user.lastWin;
+								if (winnings > 0) {
+									lastWin = winnings
+								}
+								if (user.slotsPlays) {
+									totalPlays = user.slotsPlays + 1;
+								}
 								const myobj = { id: message.author.id };
-								const newvalues = { $set: { id: message.author.id, balance: newBalance, lastWin: winnings, totalCredits: newTotal, slotsPlays: totalPlays} };
+								const newvalues = { $set: { balance: newBalance, lastWin: lastWin, totalCredits: newTotal, slotsPlays: totalPlays } };
 								dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 									if (err) throw err;
 								});
