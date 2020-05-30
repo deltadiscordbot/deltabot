@@ -5,8 +5,9 @@ module.exports = {
     name: 'profile',
     description: 'Check account profile.',
     cooldown: 10,
+    guildOnly: true,
     execute(message, args, client) {
-		MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
             if (err) throw err;
             dbInstance = db.db(currentdb);
             let userID;
@@ -20,21 +21,33 @@ module.exports = {
             } else {
                 mentionedUser = message.author;
             }
+            if(mentionedUser == undefined){
+                message.reply("please enter a valid user.")
+                return;
+            }
             user = await dbInstance.collection("users").findOne({ id: mentionedUser.id });
             db.close();
             if (user != null) {
                 const balance = user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                let lastWin = 0;
+                let blackjackPlays = 0;
+                if (user.lastWin != undefined) {
+                    lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+                if (user.blackjackPlays != undefined) {
+                    blackjackPlays = user.blackjackPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
                 const totalCredits = user.totalCredits.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 const slotsPlays = user.slotsPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 const profileEmbed = new Discord.MessageEmbed()
-                    .setAuthor(mentionedUser.tag,mentionedUser.avatarURL())
+                    .setAuthor(mentionedUser.tag, mentionedUser.avatarURL())
                     .setColor(user.color)
-                    .addField("Balance:",balance,true)
-                    .addField("Total Earnings:",totalCredits,true)
-                    .addField("Slots plays:",slotsPlays,true)
-                    .addField("Last win:", lastWin,true)
-                    message.channel.send(profileEmbed)
+                    .addField("Balance:", balance, true)
+                    .addField("Total Earnings:", totalCredits, true)
+                    .addField("Slots plays:", slotsPlays, true)
+                    .addField("Blackjack plays:", blackjackPlays, true)
+                    .addField("Last win:", lastWin, true)
+                message.channel.send(profileEmbed)
             } else {
                 message.reply("that user does not have an account.")
             }

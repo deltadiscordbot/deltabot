@@ -6,7 +6,6 @@ module.exports = {
     name: 'tag',
     description: 'Commands to provide help.',
     usage: ['(tag name)'],
-    cooldown: 10,
     guildOnly: true,
     execute(message, args) {
         if (args.length) {

@@ -11,7 +11,7 @@ module.exports = {
 			if (err) throw err;
 			dbInstance = db.db(currentdb);
 			const user = await dbInstance.collection("users").findOne({ id: message.mentions.users.first().id });
-			let balance = user.balance + parseInt(args[1]);
+			let balance = user.balance + parseFloat(args[1]);
 			var newvalues = { $set: { id: message.mentions.users.first().id, balance: balance } };
 			const myobj = { id: message.mentions.users.first().id };
 

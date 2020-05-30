@@ -2,12 +2,12 @@ const Discord = require('discord.js');
 var MongoClient = require('mongodb').MongoClient;
 const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
-    name: 'test',
-    description: 'Used for internal testing. (Owner only)',
-    needsowner: true,
-    cooldown: 1,
-    needsclient: true,
-    execute(message, args, client) {
+    name: 'blackjack',
+    description: 'Play blackjack. Default bet is 100.',
+    cooldown: 5,
+    guildOnly: true,
+    aliases: ['catch21', 'bj'],
+    execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
             if (err) throw err;
             let bet = 100;
@@ -17,7 +17,7 @@ module.exports = {
                     message.reply("please make a valid bet.")
                     return;
                 } else {
-                    bet = parseInt(args[0])
+                    bet = parseInt(args[0].replace(",", "."));
                 }
             }
             dbInstance = db.db(currentdb);
@@ -126,7 +126,7 @@ module.exports = {
                                     } else if (dealerValues == playerValues) {
                                         title = "Push!"
                                         color = "#00ff00"
-                                        winnings = bet * 1.5;
+                                        winnings = Math.ceil(bet * 1.5);
                                         newBalanceField = `${user.balance - bet + winnings} +${winnings}`
                                     } else if (dealerValues > playerValues) {
                                         color = "#ff0000"
@@ -159,9 +159,9 @@ module.exports = {
                                 msg.react("⬆️");
                                 msg.react("⏹️")
                                 const hitFilter = (reaction, user) => reaction.emoji.name === '⬆️' && user.id === message.author.id;
-                                const hitReact = msg.createReactionCollector(hitFilter, { timer: 5000, idle: 10000, dispose: true });
+                                const hitReact = msg.createReactionCollector(hitFilter, { timer: 10000, idle: 10000, dispose: true });
                                 const stopFilter = (reaction, user) => reaction.emoji.name === '⏹️' && user.id === message.author.id;
-                                const stop = msg.createReactionCollector(stopFilter, { timer: 5000, idle: 10000, dispose: true });
+                                const stop = msg.createReactionCollector(stopFilter, { timer: 10000, idle: 10000, dispose: true });
 
                                 hitReact.on('collect', r => {
                                     hitReact.resetTimer()

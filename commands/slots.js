@@ -19,7 +19,7 @@ module.exports = {
 					message.reply("please make a valid bet.")
 					return;
 				} else {
-					bet = parseInt(args[0])
+					bet = parseInt(args[0].replace(",", "."));
 				}
 			}
 			dbInstance = db.db(currentdb);
@@ -94,7 +94,7 @@ module.exports = {
 								const newBalance = user.balance - bet + winnings;
 								const newTotal = user.totalCredits + winnings;
 								const totalPlays = user.slotsPlays + 1;
-								const myobj = { id: message.author.id, balance: user.balance, dailytime: user.dailytime };
+								const myobj = { id: message.author.id };
 								const newvalues = { $set: { id: message.author.id, balance: newBalance, lastWin: winnings, totalCredits: newTotal, slotsPlays: totalPlays} };
 								dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 									if (err) throw err;

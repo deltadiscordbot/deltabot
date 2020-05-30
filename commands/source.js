@@ -78,7 +78,6 @@ module.exports = {
                                     msg.react("⌛")
                                 });
                                 backwards.on('end'), e => {
-                                    console.log("ended")
                                     msg.reactions.removeAll();
                                 }
                             }));
