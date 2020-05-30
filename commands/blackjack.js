@@ -84,7 +84,7 @@ module.exports = {
                         msg.edit(blackjackEmbed)
                     }
                     let newBalanceField;
-
+                    let didDouble;
                     function endGame(msg) {
                         endBlackjackEmbed = new Discord.MessageEmbed()
                             .setTitle(title)
@@ -128,22 +128,33 @@ module.exports = {
                                 } else {
                                     if (dealerValues > 21) {
                                         title = "WIN!"
-                                        color = "#00ff00"
+                                        if (didDouble) {
+                                            color = "#FFD700"
+                                        } else {
+                                            color = "#00ff00"
+                                        }
                                         winnings = bet * 2;
                                         newBalanceField = `${(user.balance - bet + winnings).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} +${winnings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
                                     } else if (dealerValues == playerValues) {
                                         title = "Push!"
-                                        color = "#00ff00"
+                                        if (didDouble) {
+                                            color = "#FFD700"
+                                        } else {
+                                            color = "#00ff00"
+                                        }
                                         winnings = Math.ceil(bet * 1.5);
                                         newBalanceField = `${(user.balance - bet + winnings).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} +${winnings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
                                     } else if (dealerValues > playerValues) {
                                         color = "#ff0000"
                                         title = "Lose";
                                         newBalanceField = `${(user.balance - bet + winnings).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
-
                                     } else if (playerValues > dealerValues) {
                                         title = "WIN!"
-                                        color = "#00ff00"
+                                        if (didDouble) {
+                                            color = "#FFD700"
+                                        } else {
+                                            color = "#00ff00"
+                                        }
                                         winnings = bet * 2;
                                         newBalanceField = `${(user.balance - bet + winnings).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} +${winnings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
                                     }
@@ -227,7 +238,7 @@ module.exports = {
                                     msg.reactions.removeAll();
                                     stop.stop();
                                     hitReact.stop();
-                                    color = "#FFD700";
+                                    didDouble = true;
                                     bet = bet * 2;
                                     playerHand = `${playerHand} ${hit("p", playerValues)}`
                                     blackjackEmbed = new Discord.MessageEmbed()
