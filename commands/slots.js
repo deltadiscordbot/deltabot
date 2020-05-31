@@ -32,7 +32,7 @@ module.exports = {
 				}
 				//Actual game
 				if (user.balance >= bet && bet > 0) {
-					const icons = ["<:yoshiEyes:638396688217800723>","<:Delta:626618870865723412>","<:toonlink_thumbsup:636274276885987359>","<:thinkio:636273251689168896>","<:rileyHead:654001693603921961>","<:mario_peace:636273149960388630>","<:bluetoadohyeah:636273099603443725>","<:pikaWow:638396688226320415>"];
+					const icons = ["<:yoshiEyes:638396688217800723>", "<:Delta:626618870865723412>", "<:toonlink_thumbsup:636274276885987359>", "<:thinkio:636273251689168896>", "<:rileyHead:654001693603921961>", "<:mario_peace:636273149960388630>", "<:bluetoadohyeah:636273099603443725>", "<:pikaWow:638396688226320415>"];
 					function randomSlots() {
 						return `${icons[Math.floor(Math.random() * icons.length)]}`
 					}
@@ -56,7 +56,7 @@ module.exports = {
 								.setTitle("🎰 Slots 🎰")
 								.addField("Current balance", authorText)
 								.setDescription(slots)
-								.setFooter(`Bet: ${bet} ${message.author.tag}`)
+								.setFooter(`Bet: ${bet} | ${message.author.tag}`)
 							msg.edit(slotMachine);
 						}, timer);
 						timer += 1000;
@@ -66,7 +66,7 @@ module.exports = {
 						.setTitle("🎰 Slots 🎰")
 						.addField("Current balance", authorText)
 						.setDescription(slots)
-						.setFooter(`Bet: ${bet} ${message.author.tag}`)
+						.setFooter(`Bet: ${bet} | ${message.author.tag}`)
 					message.channel.send(slotMachine)
 						.then(msg => {
 							pointlessSlots(msg);
@@ -90,8 +90,8 @@ module.exports = {
 									.setColor(color)
 									.addField("Current balance", authorText)
 									.setDescription(slots)
-									.setFooter(`Bet: ${bet} ${message.author.tag}`)
-								msg.edit(slotMachine);
+									.setFooter(`Bet: ${bet} | ${message.author.tag}`)
+								smsg.edit(slotMachine);
 								dbInstance = db.db(currentdb);
 								const newBalance = user.balance - bet + winnings;
 								const newTotal = user.totalCredits + winnings;
@@ -100,7 +100,7 @@ module.exports = {
 								if (winnings > 0) {
 									lastWin = winnings
 								}
-								if (user.slotsPlays!=undefined) {
+								if (user.slotsPlays != undefined) {
 									totalPlays = user.slotsPlays + 1;
 								}
 								const myobj = { id: message.author.id };

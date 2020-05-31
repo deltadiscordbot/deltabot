@@ -80,7 +80,7 @@ module.exports = {
                             .addField("Current balance", authorText)
                             .addField("DeltaBot's hand:", `${dealersHand}\n${dealerValues}`)
                             .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                            .setFooter(`Bet: ${bet} ${message.author.tag}`)
+                            .setFooter(`Bet: ${bet} | ${message.author.tag}`)
                         msg.edit(blackjackEmbed)
                     }
                     let newBalanceField;
@@ -92,7 +92,7 @@ module.exports = {
                             .addField("Current balance", newBalanceField)
                             .addField("DeltaBot's hand:", `${dealersHand}\n${dealerValues}`)
                             .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                            .setFooter(`Bet: ${bet} ${message.author.tag}`)
+                            .setFooter(`Bet: ${bet} | ${message.author.tag}`)
                         msg.edit(endBlackjackEmbed)
                         dbInstance = db.db(currentdb);
                         const newBalance = user.balance - bet + winnings;
@@ -171,19 +171,22 @@ module.exports = {
                         .addField("Current balance", authorText)
                         .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
                         .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                        .setFooter(`Bet: ${bet} ${message.author.tag}`)
+                        .setFooter(`Bet: ${bet} | ${message.author.tag}`)
                     message.channel.send(blackjackEmbed)
                         .then(msg => {
                             if (playerValues < 21) {
                                 msg.react("⬆️");
                                 msg.react("⏹️");
-                                msg.react("2️⃣");
+                                let doubleFilter, double;
+                                if (user.balance > (bet * 2)) {
+                                    msg.react("2️⃣");
+                                    doubleFilter = (reaction, user) => reaction.emoji.name === '2️⃣' && user.id === message.author.id;
+                                    double = msg.createReactionCollector(doubleFilter, { timer: 15000, dispose: true });
+                                }
                                 const hitFilter = (reaction, user) => reaction.emoji.name === '⬆️' && user.id === message.author.id;
                                 const hitReact = msg.createReactionCollector(hitFilter, { timer: 15000, idle: 15000, dispose: true });
                                 const stopFilter = (reaction, user) => reaction.emoji.name === '⏹️' && user.id === message.author.id;
                                 const stop = msg.createReactionCollector(stopFilter, { timer: 15000, dispose: true });
-                                const doubleFilter = (reaction, user) => reaction.emoji.name === '2️⃣' && user.id === message.author.id;
-                                const double = msg.createReactionCollector(doubleFilter, { timer: 15000, dispose: true });
                                 let canDouble = true;
                                 hitReact.on('collect', r => {
                                     hitReact.resetTimer()
@@ -201,7 +204,7 @@ module.exports = {
                                         .addField("Current balance", authorText)
                                         .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
                                         .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                                        .setFooter(`Bet: ${bet} ${message.author.tag}`)
+                                        .setFooter(`Bet: ${bet} | ${message.author.tag}`)
                                     msg.edit(blackjackEmbed)
                                     if (playerValues >= 21) {
                                         playerTurnEnd = true;
@@ -247,7 +250,7 @@ module.exports = {
                                         .addField("Current balance", authorText)
                                         .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
                                         .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                                        .setFooter(`Bet: ${bet} ${message.author.tag}`)
+                                        .setFooter(`Bet: ${bet} | ${message.author.tag}`)
                                     msg.edit(blackjackEmbed)
                                     if (playerValues > 21) {
                                         bust = true;
