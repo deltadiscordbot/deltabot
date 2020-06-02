@@ -172,7 +172,7 @@ module.exports = {
                         .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
                         .addField("Your hand:", `${playerHand}\n${playerValues}`)
                         .setFooter(`Bet: ${bet} | ${message.author.tag}`)
-                    message.channel.send(blackjackEmbed)
+                    message.reply(blackjackEmbed)
                         .then(msg => {
                             if (playerValues < 21) {
                                 msg.react("⬆️");
@@ -191,7 +191,9 @@ module.exports = {
                                 hitReact.on('collect', r => {
                                     hitReact.resetTimer()
                                     stop.resetTimer()
-                                    double.stop();
+                                    if (double != undefined) {
+                                        double.stop();
+                                    }
                                     if (canDouble) {
                                         if (msg.reactions.cache.get('2️⃣') != undefined) {
                                             msg.reactions.cache.get('2️⃣').remove().catch(error => console.error('Failed to remove reactions: ', error));
@@ -235,29 +237,29 @@ module.exports = {
                                     playerTurnEnd = true;
                                     return;
                                 });
-
-                                double.on('collect', r => {
-                                    playerTurnEnd = true;
-                                    msg.reactions.removeAll();
-                                    stop.stop();
-                                    hitReact.stop();
-                                    didDouble = true;
-                                    bet = bet * 2;
-                                    playerHand = `${playerHand} ${hit("p", playerValues)}`
-                                    blackjackEmbed = new Discord.MessageEmbed()
-                                        .setTitle("Blackjack")
-                                        .setColor(color)
-                                        .addField("Current balance", authorText)
-                                        .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
-                                        .addField("Your hand:", `${playerHand}\n${playerValues}`)
-                                        .setFooter(`Bet: ${bet} | ${message.author.tag}`)
-                                    msg.edit(blackjackEmbed)
-                                    if (playerValues > 21) {
-                                        bust = true;
-                                    }
-                                    gameover(msg)
-                                });
-
+                                if (double != undefined) {
+                                    double.on('collect', r => {
+                                        playerTurnEnd = true;
+                                        msg.reactions.removeAll();
+                                        stop.stop();
+                                        hitReact.stop();
+                                        didDouble = true;
+                                        bet = bet * 2;
+                                        playerHand = `${playerHand} ${hit("p", playerValues)}`
+                                        blackjackEmbed = new Discord.MessageEmbed()
+                                            .setTitle("Blackjack")
+                                            .setColor(color)
+                                            .addField("Current balance", authorText)
+                                            .addField("DeltaBot's hand:", `${dealersHand} ${cardBack}\n${dealerValues}`)
+                                            .addField("Your hand:", `${playerHand}\n${playerValues}`)
+                                            .setFooter(`Bet: ${bet} | ${message.author.tag}`)
+                                        msg.edit(blackjackEmbed)
+                                        if (playerValues > 21) {
+                                            bust = true;
+                                        }
+                                        gameover(msg)
+                                    });
+                                }
                                 hitReact.on('end', e => {
                                     msg.reactions.removeAll();
                                     if (!playerTurnEnd) {

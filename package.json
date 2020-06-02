@@ -1,6 +1,6 @@
 {
   "name": "delta-bot",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "The only bot playing Delta.",
   "main": "index.js",
   "dependencies": {

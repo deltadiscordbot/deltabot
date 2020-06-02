@@ -67,7 +67,7 @@ module.exports = {
 						.addField("Current balance", authorText)
 						.setDescription(slots)
 						.setFooter(`Bet: ${bet} | ${message.author.tag}`)
-					message.channel.send(slotMachine)
+					message.reply(slotMachine)
 						.then(msg => {
 							pointlessSlots(msg);
 							setTimeout(function () {
@@ -91,7 +91,7 @@ module.exports = {
 									.addField("Current balance", authorText)
 									.setDescription(slots)
 									.setFooter(`Bet: ${bet} | ${message.author.tag}`)
-								smsg.edit(slotMachine);
+								msg.edit(slotMachine);
 								dbInstance = db.db(currentdb);
 								const newBalance = user.balance - bet + winnings;
 								const newTotal = user.totalCredits + winnings;

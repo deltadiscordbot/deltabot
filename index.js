@@ -305,7 +305,6 @@ client.on('message', message => {
             .then(msg => {
                 setTimeout(function () {
                     msg.delete();
-
                 }, 5000);
             });
         }

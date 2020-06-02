@@ -33,8 +33,16 @@ module.exports = {
                 let blackjackPlays = 0;
                 let slotsPlays = 0;
                 let defaultBet = 100;
+                let con4Plays = 0;
+                let con4Wins = 0;
                 if (user.lastWin != undefined) {
                     lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+                if (user.con4Wins != undefined) {
+                    con4Wins = user.con4Wins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+                if (user.con4Plays != undefined) {
+                    con4Plays = user.con4Plays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 if (user.blackjackPlays != undefined) {
                     blackjackPlays = user.blackjackPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -53,6 +61,8 @@ module.exports = {
                     .addField("Default bet:", defaultBet, true)
                     .addField("Slots plays:", slotsPlays, true)
                     .addField("Blackjack plays:", blackjackPlays, true)
+                    .addField("Connect 4 plays:", con4Plays, true)
+                    .addField("Connect 4 wins:", con4Wins, true)
                     .addField("Last win:", lastWin, true)
                 message.channel.send(profileEmbed)
             } else {
