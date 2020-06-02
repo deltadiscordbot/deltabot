@@ -10,31 +10,30 @@ module.exports = {
 			dbInstance = db.db(currentdb);
 			const user = await dbInstance.collection("users").findOne({ id: message.author.id });
 			if (user == null) {
-				var myobj = { id: message.author.id, name: message.author.tag, balance: 1000, dailytime: Date.now(), totalCredits: 1000, color: "#000000", slotsPlays: 0, blackjackPlays: 0, lastWin: 0 };
+				const dateNow = new Date();
+				var myobj = { id: message.author.id, name: message.author.tag, balance: 1000, dailytime: dateNow, totalCredits: 1000, color: "#000000", slotsPlays: 0, blackjackPlays: 0, lastWin: 0 };
 				dbInstance.collection("users").insertOne(myobj, function (err, res) {
 					if (err) throw err;
 					message.reply(`account created. \`1,000\` credits were added to your balance.`)
 					db.close();
 				});
 			} else {
-				const oneday = 60 * 60 * 24 * 1000
-				if ((Date.now() - user.dailytime) > oneday) {
+				const two = user.dailytime
+				const dateNow = new Date();
+				var millisecondsPerDay = 1000 * 60 * 60 * 24;
+				var millisBetween = dateNow - two;
+				var days = parseInt(millisBetween / millisecondsPerDay);
+				if (days > 0) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
-					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: Date.now(), totalCredits: newTotal } };
+					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow, totalCredits: newTotal } };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
 						message.reply(`\`1,000\` daily credits redeemed. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
 					});
 				} else {
-					let timeLeft = `${Math.ceil((oneday - (Date.now() - user.dailytime) / (1000 * 60 * 60)) % 24)} hours`
-					if (Math.floor((oneday - (Date.now() - user.dailytime) / (1000  * 60)) % 24) == 0) {
-						timeLeft = `${Math.ceil((oneday - (Date.now() - user.dailytime) / (1000)) % 24)} seconds`
-					}else if (Math.floor((oneday - (Date.now() - user.dailytime) / (1000  * 60 *60)) % 24) == 0){
-						timeLeft = `${Math.ceil((oneday - (Date.now() - user.dailytime) / (1000 * 60)) % 24)} minutes`
-					}
-					message.reply(`you need to wait another ${timeLeft} before collecting your daily credits.`)
+					message.reply(`you need to wait until tomorrow before collecting your daily credits.`)
 				}
 				db.close();
 			}

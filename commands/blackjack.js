@@ -121,8 +121,8 @@ module.exports = {
                             endGame(msg);
                         } else {
                             setTimeout(() => {
-                                dealersTurn(msg);
                                 if (dealerValues < 17) {
+                                    dealersTurn(msg);
                                     gameover(msg);
                                     return;
                                 } else {
