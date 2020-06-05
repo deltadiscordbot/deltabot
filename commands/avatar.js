@@ -23,7 +23,7 @@ module.exports = {
             .setTitle(user.tag)
             .setImage(userAvatar)
             .setTimestamp()
-            .setFooter(`Requested by: @${message.author.tag}`, userAvatar);
+            .setFooter(`Requested by: @${message.author.tag}`);
         message.channel.send(modEmbed);
     },
 };

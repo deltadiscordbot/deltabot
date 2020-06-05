@@ -69,13 +69,14 @@ module.exports = {
 					let whosTurn = message.author;
 					const player1 = message.author;
 					let player2, user2, gameMessage, winner = "";
+					let canStop = true;
 					function startGame(u, user, msg, timer) {
+						clearInterval(timer);
 						user2 = user;
 						gameMessage = msg;
 						player2 = u;
-						clearInterval(timer);
+						msg.reactions.cache.get('✅').remove().catch(error => console.error('Failed to remove reactions: ', error));
 						gameStarted = true;
-						msg.reactions.removeAll();
 						buildBoard();
 						let connect4Embed = new Discord.MessageEmbed()
 							.setTitle(`Connect 4 | ${whosTurn.username}'s turn | ${moveTimeout} secs`)
@@ -202,6 +203,10 @@ module.exports = {
 					}
 
 					function playingGame() {
+						if (canStop) {
+							gameMessage.reactions.removeAll();
+						}
+						canStop = false;
 						buildBoard();
 						winCheck();
 						if (winner == "") {
@@ -319,6 +324,7 @@ module.exports = {
 							}, 5000);
 							setTimeout(() => {
 								if (!gameStarted) {
+									msg.reactions.cache.get('✅').remove().catch(error => console.error('Failed to remove reactions: ', error));
 									clearInterval(timer);
 									let connect4Embed = new Discord.MessageEmbed()
 										.setTitle("Connect 4")
@@ -329,8 +335,11 @@ module.exports = {
 								}
 							}, timeout * 1000);
 							msg.react("✅");
+							msg.react("❌")
 							const playFilter = (reaction, user) => reaction.emoji.name === '✅' && (user.id != (msg.author.id) && (user.id != message.author.id));
 							const playReact = msg.createReactionCollector(playFilter, { timer: 30000, idle: 30000, dispose: true });
+							const stopFilter = (reaction, user) => reaction.emoji.name === '❌' && user.id == message.author.id;
+							const stopReact = msg.createReactionCollector(stopFilter, { timer: 30000, idle: 30000, dispose: true });
 							playReact.on("collect", (r, u) => {
 								dbInstance.collection("users").findOne({ id: u.id })
 									.then(player2 => {
@@ -353,7 +362,16 @@ module.exports = {
 										}
 									})
 							})
-							playReact.on("end", e => {
+							stopReact.on("collect", r => {
+								clearInterval(timer);
+								let connect4Embed = new Discord.MessageEmbed()
+									.setTitle("Connect 4")
+									.setDescription(`Game cancelled.`)
+									.setFooter(`Bet: ${bet} | ${message.author.tag}`)
+								msg.edit(connect4Embed)
+								msg.reactions.removeAll();
+								stopReact.stop();
+								playReact.stop();
 							})
 						})
 				} else {

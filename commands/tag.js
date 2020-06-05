@@ -14,7 +14,13 @@ module.exports = {
                 dbInstance = db.db(currentdb);
                 const items = await dbInstance.collection("tags").findOne({ name: args.toString() });
                 if (items == null) {
-                    message.reply("there is no tag with that name.");
+                    message.reply("there is no tag with that name.")
+                        .then(msg => {
+                            message.delete();
+                            setTimeout(() => {
+                                msg.delete();
+                            }, 5000);
+                        })
                 } else {
                     message.delete();
                     message.channel.send(items.content)

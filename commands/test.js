@@ -7,10 +7,9 @@ module.exports = {
     needsowner: true,
     cooldown: 1,
     needsclient: true,
-    execute(message, args, client) {
-        const test = new Discord.MessageEmbed()
-            .setDescription(":banana:");
-        message.channel.send(test)
-
+    async execute(message, args, client) {
+        const ayy = await client.emojis.cache.find(emoji => emoji.name === "loading");
+        console.log(ayy.id)
+        message.channel.send(ayy)
     },
 };

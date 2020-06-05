@@ -4,8 +4,8 @@ module.exports = {
 	description: 'Restarts the bot. (Owner only)',
 	needsowner: true,
 	execute(message, args) {
+		message.reply("restarting")
 		pm2.connect();
 		pm2.restart("0");
-		message.reply("restarting")
 	},
 };
