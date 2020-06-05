@@ -1,6 +1,6 @@
 {
   "name": "delta-bot",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "The only bot playing Delta.",
   "main": "index.js",
   "dependencies": {
@@ -9,8 +9,10 @@
     "mongod": "^2.0.0",
     "mongodb": "^3.5.7",
     "node-fetch": "^2.6.0",
+    "node-server-screenshot": "^0.2.4",
     "pm2": "^4.4.0",
-    "translate": "^1.1.2"
+    "translate": "^1.1.2",
+    "twitter-lite": "^0.13.0"
   },
   "devDependencies": {},
   "scripts": {

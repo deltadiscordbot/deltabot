@@ -1,22 +1,32 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 let { prefix } = require('./config.json');
-const { mainSourceURL, alphaSourceURL, ownerID } = require('./config.json');
+const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken } = require('./config.json');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const { token, mongodbase, currentdb } = require('./config.json');
 require('log-timestamp')(function () { return new Date().toLocaleString() + ' "%s"' });
 const client = new Discord.Client();
+const Twitter = require('twitter-lite');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns = new Discord.Collection();
 let announceChannels = [];
 let betaannounceChannels = [];
+let twitterchannels = [];
 const settings = { method: "Get" };
 let altstoreApps, dbInstance, welcomechannelID, modRoles, logChannelID, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
-
+const twitterClient = new Twitter({
+    consumer_key: twitterAPIKey,
+    consumer_secret: twitterAPISecret,
+    access_token_key: twitterAccessToken,
+    access_token_secret: twitterAccessSecret,
+});
+const twitterParameters = {
+    follow: "1137807296778498048",
+};
 function updateVersions() {
     fetch(mainSourceURL, settings)
         .then(res => res.json())
@@ -240,6 +250,11 @@ function updateVars() {
             index++;
         });
         index = 0;
+        items.twitterchannel.forEach(element => {
+            twitterchannels[index] = client.channels.cache.get(element);
+            index++;
+        });
+        index = 0;
         items.betaannouncechannel.forEach(element => {
             betaannounceChannels[index] = client.channels.cache.get(element);
             index++;
@@ -265,13 +280,34 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
+let deltaDiscord, altstoreDiscord;
 
-client.once('ready', () => {
+client.once('ready', async () => {
     updateVars();
     updateVersions();
-    setInterval(updateVersions, 60 * 1000);
+    setInterval(updateVersions, 60000);
     console.log('Ready!');
+    deltaDiscord = client.guilds.cache.get("625714187078860810");
+    altstoreDiscord = client.guilds.cache.get("625766896230334465");
 });
+
+twitterClient.stream("statuses/filter", twitterParameters)
+    .on("start", response => console.log("twitter stream started"))
+    .on("data", tweet => {
+        console.log(tweet)
+        if (tweet.in_reply_to_status_id == null && tweet.retweet_count == 0 && tweet.user.screen_name == "altstoreio") {
+            const twitterEmbed = new Discord.MessageEmbed()
+                .setAuthor(tweet.user.name, tweet.user.profile_image_url_https, `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`)
+                .setDescription(tweet.text)
+                .setTimestamp()
+                .setFooter("Twitter", "https://cdn.discordapp.com/attachments/686065512181923969/718508442691567786/Twitterlogo2012.png")
+            twitterchannels.forEach(element => {
+                element.send(twitterEmbed);
+            });
+        }
+    })
+    .on("error", error => console.log("error", error))
+    .on("end", response => console.log("twitter stream ended"));
 
 client.on('message', message => {
     if (!(message.content.startsWith(prefix) || message.mentions.users.first() == client.user) || message.author.bot) return;
@@ -302,11 +338,11 @@ client.on('message', message => {
         if (now < expirationTime) {
             const timeLeft = (expirationTime - now) / 1000;
             return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
-            .then(msg => {
-                setTimeout(function () {
-                    msg.delete();
-                }, 5000);
-            });
+                .then(msg => {
+                    setTimeout(function () {
+                        msg.delete();
+                    }, 5000);
+                });
         }
     }
     timestamps.set(message.author.id, now);
@@ -367,25 +403,36 @@ client.on('message', message => {
 //Join message
 client.on('guildMemberAdd', member => {
     // AltStore Discord
-    let channel;
     if (member.guild.id == "625766896230334465") {
-        channel = member.guild.channels.cache.get(welcomechannelID);
-    } else if (member.guild.id == "625714187078860810") { //Delta Discord
-        channel = member.guild.channels.cache.get(welcomechannelID);
+        let deltaMember, role;
+        async () => {
+            deltaMember = await deltaDiscord.members.cache.get(member.user.id);
+            role = await deltaDiscord.roles.cache.find(role => role.id === '626544956567322656');
+        }
+        if (!deltaMember.roles.cache.some(role => role.id === '626544956567322656')) {
+            deltaMember.roles.add(role);
+        };
+    } else if (member.guild.id == "625714187078860810") {
+        //Delta Discord
+        let altMember, role;
+        async () => {
+            try {
+                altMember = await altstoreDiscord.members.cache.get(member.user.id);
+            } catch (error) {
+                console.log(error)
+            }
+            role = await deltaDiscord.roles.cache.find(role => role.id === '626544956567322656')
+        }
+        if (altMember != undefined) {
+            if (!member.roles.cache.some(role => role.id === '626544956567322656')) {
+                member.roles.add(role);
+            }
+        }
     }
-    // Do nothing if the channel wasn't found on this server
-    if (!channel) return;
-
-    // Send the message, mentioning the member
-    channel.send(`Welcome to the server, ${member}! Please read the info below.`);
-    const modEmbed = new Discord.MessageEmbed()
-        .setColor('#32CD32')
-        .setTitle("Member Joined")
-    channel.send(modEmbed);
 });
 
 //Deleted message
-client.on('messageDelete', message => {
+/* client.on('messageDelete', message => {
     if (message.channel.type === 'dm') return;
     let logchannel = message.guild.channels.cache.get(logChannelID);
     if (!logchannel) return;
@@ -488,6 +535,6 @@ client.on('channelDelete', channel => {
                 .setTimestamp()
             logchannel.send(modEmbed);
         });
-})
+}) */
 
 client.login(token);
