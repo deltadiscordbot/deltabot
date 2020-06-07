@@ -277,7 +277,7 @@ module.exports = {
                         })
                 } else {
                     if (bet == 0) {
-                        message.reply("please bet more than 0.");
+                        message.reply("please make a bet.")
                         return;
                     }
                     message.reply("sorry, you do not have enough credits to make that bet.")

@@ -15,7 +15,7 @@ module.exports = {
 				message.reply(`you do not have an account. Do \`!daily\` to make one.`)
 				db.close();
 			} else {
-				message.reply(`you have ${user.balance} credits.`)
+				message.reply(`you have ${user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} credits.`)
 			}
 			db.close();
 

@@ -111,7 +111,11 @@ module.exports = {
 
 							}, timer);
 						})
-				} else {
+				} else if (bet == 0) {
+					message.reply("please make a bet.")
+					return;
+				}
+				else {
 					message.reply("sorry, you do not have enough credits to make that bet.")
 				}
 			}

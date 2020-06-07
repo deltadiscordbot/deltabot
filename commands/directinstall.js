@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 module.exports = {
 	name: 'directinstall',
-	description: 'Links a direct install. (Owner only)',
-	needsowner: true,
+	description: 'Links a direct install. (Mod only)',
+	needsmod: true,
 	aliases: ['di'],
 	args: true,
 	execute(message, args) {

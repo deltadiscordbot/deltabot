@@ -26,6 +26,7 @@ const twitterClient = new Twitter({
 });
 const twitterParameters = {
     follow: "1137807296778498048",
+    tweet_mode: "extended"
 };
 function updateVersions() {
     fetch(mainSourceURL, settings)
@@ -62,10 +63,6 @@ function updateVersions() {
             MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {
                 if (err) throw err;
                 dbInstance = db.db(currentdb);
-                //newDeltaVersion = "1.0" //testing
-                //newAltstoreVersion = "1.0" //testing
-                //newAltstoreBetaVersion = "4.0" //testing
-                //newDeltaBetaVersion = "3.0" //testing
 
                 //AltStore
                 if (newAltstoreVersion != oldAltstoreVersion) {
@@ -190,7 +187,7 @@ function updateVersions() {
                             .setThumbnail(newAltstoreData['iconURL'])
                             .setTitle("New AltStore Alpha update!")
                             .addField("Version:", `${oldAltstoreAlphaVersion} -> ${newAltstoreVersion}`, true)
-                            .addField("What's new:", newAltstoreData['versionDescription'])
+                            .addField("What's new:", newAltstoreData['versionDescription'].substring(0, 1024))
                             .addField("Add source:", alphaSourceURL)
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
@@ -212,7 +209,7 @@ function updateVersions() {
                             .setThumbnail(newDeltaData['iconURL'])
                             .setTitle("New Delta Alpha update!")
                             .addField("Version:", `${oldDeltaAlphaVersion} -> ${newDeltaVersion}`, true)
-                            .addField("What's new:", newDeltaData['versionDescription'])
+                            .addField("What's new:", newDeltaData['versionDescription'].substring(0, 1024))
                             .addField("Add source:", alphaSourceURL)
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
@@ -298,7 +295,7 @@ twitterClient.stream("statuses/filter", twitterParameters)
         if (tweet.in_reply_to_status_id == null && tweet.retweet_count == 0 && tweet.user.screen_name == "altstoreio") {
             const twitterEmbed = new Discord.MessageEmbed()
                 .setAuthor(tweet.user.name, tweet.user.profile_image_url_https, `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`)
-                .setDescription(tweet.text)
+                .setDescription(tweet.extended_tweet.full_text.substring(0, 2048))
                 .setTimestamp()
                 .setFooter("Twitter", "https://cdn.discordapp.com/attachments/686065512181923969/718508442691567786/Twitterlogo2012.png")
             twitterchannels.forEach(element => {
@@ -406,12 +403,18 @@ client.on('guildMemberAdd', member => {
     if (member.guild.id == "625766896230334465") {
         let deltaMember, role;
         async () => {
-            deltaMember = await deltaDiscord.members.cache.get(member.user.id);
+            try {
+                deltaMember = await deltaDiscord.members.cache.get(member.user.id);
+            } catch (error) {
+                console.log(error)
+            }
             role = await deltaDiscord.roles.cache.find(role => role.id === '626544956567322656');
         }
-        if (!deltaMember.roles.cache.some(role => role.id === '626544956567322656')) {
-            deltaMember.roles.add(role);
-        };
+        if (deltaMember != undefined) {
+            if (!deltaMember.roles.cache.some(role => role.id === '626544956567322656')) {
+                deltaMember.roles.add(role);
+            };
+        }
     } else if (member.guild.id == "625714187078860810") {
         //Delta Discord
         let altMember, role;
