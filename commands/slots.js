@@ -5,7 +5,6 @@ module.exports = {
 	name: 'slots',
 	description: 'Play slots. Default bet is 100.',
 	guildOnly: true,
-	cooldown: 3,
 	usage: ['[bet]'],
 	aliases: ['spin'],
 	execute(message, args) {

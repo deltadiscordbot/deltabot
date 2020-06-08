@@ -4,7 +4,6 @@ const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
     name: 'blackjack',
     description: 'Play blackjack. Default bet is 100.',
-    cooldown: 5,
     guildOnly: true,
     aliases: ['catch21', 'bj'],
     execute(message, args) {

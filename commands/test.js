@@ -8,8 +8,7 @@ module.exports = {
     cooldown: 1,
     needsclient: true,
     async execute(message, args, client) {
-        const ayy = await client.emojis.cache.find(emoji => emoji.name === "loading");
-        console.log(ayy.id)
-        message.channel.send(ayy)
+        sendChannel = client.channels.cache.get(args[0]);
+        sendChannel.send("Deleting server... <a:loading:718190657579253782>")
     },
 };
