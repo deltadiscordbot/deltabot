@@ -7,23 +7,35 @@ module.exports = {
   cooldown: 10,
   updatedb: true,
   guildOnly: true,
+  needsclient: true,
   aliases: ['lookup'],
-  execute(message, args) {
-      const userObject = message.mentions.users.size
-        ? message.mentions.users.first()
-        : message.author;
-      const memberObject = message.guild.member(userObject);
-      const username = userObject.tag;
-      const userAvatar = userObject.avatarURL();
-      const userCreated = userObject.createdAt.toDateString() + ", " + userObject.createdAt.toLocaleTimeString('en-US');
-      const userID = userObject.id;
-      const userJoinedServer = memberObject.joinedAt.toDateString() + ", " + memberObject.joinedAt.toLocaleTimeString('en-US');
-      const userRoles = memberObject.roles.cache.map(roles => roles).join(", ");
-      const sortedmembers = message.guild.members.cache.array();
-      sortedmembers.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp)
-      const userJoinPosition = sortedmembers.indexOf(memberObject) + 1
+  execute(message, args, client) {
+    let userObject;
+    if (args.length) {
+      if (message.mentions.users.size) {
+        userObject = message.mentions.users.first()
+      } else if (client.users.cache.find(user => user.id === args[0].toString())) {
+        userObject = client.users.cache.find(user => user.id === args[0].toString())
+      } else if (client.users.cache.find(user => user.username.toLowerCase() === args.join(" ").toString().toLowerCase())) {
+        userObject = client.users.cache.find(user => user.username.toLowerCase() === args.join(" ").toString().toLowerCase())
+      } else {
+        userObject = message.author
+      }
+    } else {
+      userObject = message.author
+    }
+    const memberObject = message.guild.member(userObject);
+    const username = userObject.tag;
+    const userAvatar = userObject.avatarURL();
+    const userCreated = userObject.createdAt.toDateString() + ", " + userObject.createdAt.toLocaleTimeString('en-US');
+    const userID = userObject.id;
+    const userJoinedServer = memberObject.joinedAt.toDateString() + ", " + memberObject.joinedAt.toLocaleTimeString('en-US');
+    const userRoles = memberObject.roles.cache.map(roles => roles).join(", ");
+    const sortedmembers = message.guild.members.cache.array();
+    sortedmembers.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp)
+    const userJoinPosition = sortedmembers.indexOf(memberObject) + 1
     const modEmbed = new Discord.MessageEmbed()
-      .setColor('#32CD32')
+      .setColor('#8A28F7')
       .setAuthor(username)
       .setThumbnail(userAvatar)
       .addField("User created:", userCreated, true)
