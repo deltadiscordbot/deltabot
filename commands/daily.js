@@ -20,10 +20,10 @@ module.exports = {
 			} else {
 				const two = user.dailytime
 				const dateNow = new Date();
-				var millisecondsPerDay = 1000 * 60 * 60 * 24;
+				var millisecondsPerDay = 1000 * 60 * 60 * 12;
 				var millisBetween = dateNow - two;
 				var days = parseInt(millisBetween / millisecondsPerDay);
-				if (days > 0) {
+				if (days > .5) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };

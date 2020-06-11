@@ -1,11 +1,10 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 let { prefix } = require('./config.json');
-const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken } = require('./config.json');
+const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken, token, mongodbase, currentdb, numbers, computers, devices, versions } = require('./config.json');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
-const { token, mongodbase, currentdb } = require('./config.json');
 require('log-timestamp')(function () { return new Date().toLocaleString() + ' "%s"' });
 const client = new Discord.Client();
 const Twitter = require('twitter-lite');
@@ -15,6 +14,8 @@ const cooldowns = new Discord.Collection();
 let announceChannels = [];
 let betaannounceChannels = [];
 let twitterchannels = [];
+const betaRole = "<@&716483174028410962>";
+const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
 let altstoreApps, dbInstance, welcomechannelID, modRoles, logChannelID, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
@@ -102,7 +103,10 @@ function updateVersions() {
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
-                            element.send(modEmbed);
+                            element.send(betaRole)
+                                .then(msg => {
+                                    msg.edit(modEmbed);
+                                })
                         });
                     })
                 }
@@ -145,9 +149,11 @@ function updateVersions() {
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
-                            element.send(modEmbed);
+                            element.send(betaRole)
+                                .then(msg => {
+                                    msg.edit(modEmbed);
+                                })
                         });
-
                     });
                 }
             });
@@ -192,7 +198,10 @@ function updateVersions() {
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
-                            element.send(modEmbed);
+                            element.send(alphaRole)
+                                .then(msg => {
+                                    msg.edit(modEmbed);
+                                })
                         });
                     })
                 }
@@ -214,9 +223,11 @@ function updateVersions() {
                             .setTimestamp()
                             .setFooter(package.name + ' v. ' + package.version);
                         betaannounceChannels.forEach(element => {
-                            element.send(modEmbed);
+                            element.send(alphaRole)
+                                .then(msg => {
+                                    msg.edit(modEmbed);
+                                })
                         });
-
                     });
                 }
             });
@@ -277,35 +288,100 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
-let deltaDiscord, altstoreDiscord;
-
+let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
 client.once('ready', async () => {
     updateVars();
     updateVersions();
     setInterval(updateVersions, 60000);
     console.log('Ready!');
-    deltaDiscord = client.guilds.cache.get("625714187078860810");
+    deltaDiscord = client.guilds.cache.get("625714187078860810")
     altstoreDiscord = client.guilds.cache.get("625766896230334465");
+    initReactionRoles();
 });
 
-twitterClient.stream("statuses/filter", twitterParameters)
+function initReactionRoles() {
+    deltaRoleChannel = client.channels.cache.get("719296628904951819");
+    deltaRoleChannel.messages.fetch("719312071992279242") //computers in delta
+        .then(computerMessage => {
+            createRR(computerMessage, computers);
+        });
+    deltaRoleChannel.messages.fetch("719312073040855061") //versions in delta
+        .then(versionMessage => {
+            createRR(versionMessage, versions);
+        });
+    deltaRoleChannel.messages.fetch("719312126702780516") //devices in delta
+        .then(deviceMessage => {
+            createRR(deviceMessage, devices);
+        });
+
+    altstoreRoleChannel = client.channels.cache.get("719294939451621377");
+    altstoreRoleChannel.messages.fetch("719296388311285861") //computers in altstore
+        .then(computerMessage => {
+            createRR(computerMessage, computers);
+        });
+    altstoreRoleChannel.messages.fetch("719296390009978880") //versions in altstore
+        .then(versionMessage => {
+            createRR(versionMessage, versions);
+        });
+    altstoreRoleChannel.messages.fetch("719296390358106153") //devices in altstore
+        .then(deviceMessage => {
+            createRR(deviceMessage, devices);
+        });
+}
+function createRR(message, array) {
+    let embedBody = "";
+    for (let index = 0; index < array.length; index++) {
+        embedBody += `${numbers[index]} ${array[index]}\n\n`
+    }
+    let currentEmbed = new Discord.MessageEmbed()
+        .setDescription(embedBody);
+    message.edit(currentEmbed)
+    let currentFilter = [];
+    let currentCollector = [];
+    for (let index = 0; index < array.length; index++) {
+        let role = message.guild.roles.cache.find(x => x.name == array[index]);
+        if (!role) {
+            message.guild.roles.create({
+                data: {
+                    name: array[index],
+                }
+            })
+                .catch(console.error);
+        }
+        message.react(numbers[index]);
+        currentFilter[index] = (reaction, user) => reaction.emoji.name === numbers[index] && user.id != message.author.id;
+        currentCollector[index] = message.createReactionCollector(currentFilter[index], { dispose: true });
+    }
+    currentCollector.forEach(element => {
+        element.on("collect", (r, u) => {
+            const member = message.guild.member(u);
+            const role = message.guild.roles.cache.find(role => role.name === array[numbers.indexOf(r.emoji.name.toString())]);
+            if (!member.roles.cache.some(role => role.name === array[numbers.indexOf(r.emoji.name.toString())])) {
+                member.roles.add(role);
+            }
+        })
+        element.on("remove", (r, u) => {
+            const member = message.guild.member(u);
+            const role = message.guild.roles.cache.find(role => role.name === array[numbers.indexOf(r.emoji.name.toString())]);
+            if (member.roles.cache.some(role => role.name === array[numbers.indexOf(r.emoji.name.toString())])) {
+                member.roles.remove(role);
+            }
+        })
+    });
+}
+
+/* twitterClient.stream("statuses/filter", twitterParameters)
     .on("start", response => console.log("twitter stream started"))
     .on("data", tweet => {
-        console.log(tweet)
         if (tweet.in_reply_to_status_id == null && tweet.retweet_count == 0 && tweet.user.screen_name == "altstoreio") {
-            const twitterEmbed = new Discord.MessageEmbed()
-                .setAuthor(tweet.user.name, tweet.user.profile_image_url_https, `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`)
-                .setDescription(tweet.extended_tweet.full_text.substring(0, 2048))
-                .setTimestamp()
-                .setFooter("Twitter", "https://cdn.discordapp.com/attachments/686065512181923969/718508442691567786/Twitterlogo2012.png")
             twitterchannels.forEach(element => {
-                element.send(twitterEmbed);
+                element.send(`https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`);
             });
         }
     })
     .on("error", error => console.log("error", error))
     .on("end", response => console.log("twitter stream ended"));
-
+ */
 client.on('message', message => {
     if (!(message.content.startsWith(prefix) || message.mentions.users.first() == client.user) || message.author.bot) return;
     var args;

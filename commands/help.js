@@ -37,7 +37,7 @@ module.exports = {
             const helpEmbed = new Discord.MessageEmbed()
                 .setColor('#8A28F7')
                 .setTitle("Here\'s a list of all my commands:")
-                .addField("Commands:", currentString)
+                .setDescription(currentString)
                 .addField("Mod commands:", modString)
                 .addField("Admin commands:", adminString)
                 .setTimestamp()

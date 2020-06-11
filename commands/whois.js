@@ -1,5 +1,5 @@
 const { mongodbase, currentdb } = require('../config.json');
-const package = require('../package.json');
+var MongoClient = require('mongodb').MongoClient;
 const Discord = require('discord.js');
 module.exports = {
   name: 'whois',
@@ -32,18 +32,29 @@ module.exports = {
     const userJoinedServer = memberObject.joinedAt.toDateString() + ", " + memberObject.joinedAt.toLocaleTimeString('en-US');
     const userRoles = memberObject.roles.cache.map(roles => roles).join(", ");
     const sortedmembers = message.guild.members.cache.array();
-    sortedmembers.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp)
+    sortedmembers.sort((a, b) => a.joinedAt - b.joinedAt)
     const userJoinPosition = sortedmembers.indexOf(memberObject) + 1
-    const modEmbed = new Discord.MessageEmbed()
-      .setColor('#8A28F7')
-      .setAuthor(username)
-      .setThumbnail(userAvatar)
-      .addField("User created:", userCreated, true)
-      .addField("Joined server:", userJoinedServer, true)
-      .addField("Join position:", userJoinPosition, true)
-      .addField("User roles:", userRoles)
-      .setTimestamp()
-      .setFooter(`ID: ${userID}`);
-    message.channel.send(modEmbed);
+    let fields = [{ name: "User created:", value: userCreated, inline: true }, { name: "Joined server:", value: userJoinedServer, inline: true }, { name: "Join position:", value: userJoinPosition, inline: true }, { name: "User roles:", value: userRoles, inline: true }]
+    MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
+      if (err) throw err;
+      dbInstance = db.db(currentdb);
+      let color = "#8A28F7";
+      user = await dbInstance.collection("users").findOne({ id: userObject.id })
+      if (user != null) {
+        coloe = user.color;
+        if (user.specialack) {
+          fields.push({ name: "Special Acknowledgements", value: user.specialack })
+        }
+      }
+      const modEmbed = new Discord.MessageEmbed()
+        .setColor(color)
+        .setAuthor(username)
+        .setThumbnail(userAvatar)
+        .addFields(fields)
+        .setTimestamp()
+        .setFooter(`ID: ${userID}`);
+      message.channel.send(modEmbed)
+        .then(msg => { db.close() });
+    });
   },
 };
