@@ -9,6 +9,7 @@ module.exports = {
   description: `Adds a role as a moderator for ${package.name} (Admin only)`,
   usage: ['[role]'],
   cooldown: 10,
+  category: "admin",
   updatedb: true,
   needsadmin: true,
   args: true,

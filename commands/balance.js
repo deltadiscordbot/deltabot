@@ -4,6 +4,7 @@ module.exports = {
 	name: 'balance',
 	description: 'Gets credits balance.',
 	guildOnly: true,
+	category: "eco",
 	cooldown: 30,
 	aliases: ['bal'],
 	execute(message, args) {

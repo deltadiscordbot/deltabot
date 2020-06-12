@@ -8,6 +8,7 @@ module.exports = {
   description: 'Sets a new announcement channel for this server. (Admin only)',
   usage: ['[channel]'],
   cooldown: 30,
+  category: "admin",
   updatedb: true,
   needsadmin: true,
   guildOnly: true,

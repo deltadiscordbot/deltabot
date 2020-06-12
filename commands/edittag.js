@@ -7,6 +7,7 @@ module.exports = {
     cooldown: 10,
     aliases: ['changetag'],
     needsmod: true,
+    category: "mod",
     guildOnly: true,
     args: true,
     execute(message, args) {

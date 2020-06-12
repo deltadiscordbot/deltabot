@@ -7,6 +7,7 @@ module.exports = {
   usage: ['[prefix]'],
   cooldown: 30,
   updatedb: true,
+  category: "mod",
   needsmod: true,
   guildOnly: true,
   execute(message, args) {

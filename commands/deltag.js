@@ -7,6 +7,7 @@ module.exports = {
     aliases: ['deletetag'],
     cooldown: 10,
     needsmod: true,
+    category: "mod",
     guildOnly: true,
     args: true,
     execute(message, args) {

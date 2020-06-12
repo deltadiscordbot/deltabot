@@ -7,6 +7,7 @@ module.exports = {
 	guildOnly: true,
 	usage: ['[bet]'],
 	aliases: ['spin'],
+	category: "eco",
 	execute(message, args) {
 		MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
 			if (err) throw err;

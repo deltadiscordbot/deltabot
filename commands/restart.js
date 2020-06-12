@@ -3,6 +3,7 @@ module.exports = {
 	name: 'restart',
 	description: 'Restarts the bot. (Owner only)',
 	needsowner: true,
+	category: "owner",
 	execute(message, args) {
 		message.reply("restarting")
 		pm2.connect();

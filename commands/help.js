@@ -22,14 +22,27 @@ module.exports = {
         let currentString = '';
         let modString = '';
         let adminString = '';
+        let funString = '';
+        let ecoString = '';
         if (!args.length) {
             for (let elem of commands.entries()) {
-                if (elem[1].description.includes("Mod only")) {
-                    modString = modString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
-                } else if (elem[1].description.includes("Admin only") || elem[1].description.includes("Owner only")) {
-                    adminString = adminString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
-                } else {
-                    currentString = currentString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                switch (elem[1].category) {
+                    case "mod":
+                        modString = modString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
+                    case "admin":
+                    case "owner":
+                        adminString = adminString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
+                    case "fun":
+                        funString = funString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
+                    case "eco":
+                        ecoString = ecoString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
+                    default:
+                        currentString = currentString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
                 }
             }
             adminString = adminString + `\n\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`;
@@ -38,6 +51,8 @@ module.exports = {
                 .setColor('#8A28F7')
                 .setTitle("Here\'s a list of all my commands:")
                 .setDescription(currentString)
+                .addField("Fun commands:", funString)
+                .addField("Economy commands:", ecoString)
                 .addField("Mod commands:", modString)
                 .addField("Admin commands:", adminString)
                 .setTimestamp()

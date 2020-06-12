@@ -7,8 +7,8 @@ module.exports = {
     needsowner: true,
     cooldown: 1,
     needsclient: true,
+    category: "owner",
     async execute(message, args, client) {
-        sendChannel = client.channels.cache.get(args[0]);
-        sendChannel.send("Deleting server... <a:loading:718190657579253782>")
+        message.channel.send("<@&719282287367159879>")
     },
 };

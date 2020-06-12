@@ -5,6 +5,7 @@ module.exports = {
 	description: 'Gives credits. (Owner only)',
 	guildOnly: true,
 	needsowner: true,
+	category: "owner",
 	args: true,
 	execute(message, args) {
 		MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {

@@ -6,6 +6,7 @@ module.exports = {
     needsmod: true,
     args: true,
     guildOnly: true,
+    category: "mod",
     execute(message, args) {
         message.delete();
         message.channel.send(args.join(" "));

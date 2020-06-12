@@ -3,6 +3,7 @@ module.exports = {
 	description: 'Reloads a command. (Owner only)',
 	args: true,
 	needsowner: true,
+	category: "owner",
 	execute(message, args) {
 		const commandName = args[0].toLowerCase();
 		const command = message.client.commands.get(commandName)

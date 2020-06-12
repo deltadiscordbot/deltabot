@@ -5,6 +5,7 @@ module.exports = {
     description: 'Sets your default bet.',
     cooldown: 5,
     guildOnly: true,
+    category: "eco",
     args: true,
     execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {

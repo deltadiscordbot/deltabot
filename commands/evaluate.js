@@ -4,6 +4,7 @@ module.exports = {
     aliases: ['e'],
     needsowner: true,
     needsclient: true,
+    category: "owner",
     args: true,
     execute(message, args, client) {
         const evaluation = eval(args.join(" "))

@@ -5,6 +5,7 @@ module.exports = {
     cooldown: 10,
     needsowner: true,
     args: true,
+    category: "owner",
     guildOnly: true,
     execute(message, args) {
         message.guild.channels.cache.get(args[0]).messages.fetch(args[1])

@@ -12,6 +12,7 @@ module.exports = {
   aliases: ['deletemodrole'],
   updatedb: true,
   guildOnly: true,
+  category: "admin",
   needsadmin: true,
   args: true,
   execute(message, args) {

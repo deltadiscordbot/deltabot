@@ -4,6 +4,7 @@ module.exports = {
     usage: ['[number]'],
     cooldown: 5,
     args: true,
+    category: "mod",
     guildOnly: true,
     needsmod: true,
     execute(message, args) {

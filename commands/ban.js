@@ -4,6 +4,7 @@ module.exports = {
   guildOnly: true,
   usage: '[user] or [user ID]',
   args: true,
+  category: "mod",
   needsmod: true,
   execute(message, args) {
     // Ignore messages that aren't from a guild

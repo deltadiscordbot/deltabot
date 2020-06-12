@@ -6,6 +6,7 @@ module.exports = {
     cooldown: 10,
     guildOnly: true,
     args: true,
+    category: "eco",
     execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
             if (err) throw err;

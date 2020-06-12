@@ -5,6 +5,7 @@ module.exports = {
     name: 'blackjack',
     description: 'Play blackjack. Default bet is 100.',
     guildOnly: true,
+    category: "eco",
     aliases: ['catch21', 'bj'],
     execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {

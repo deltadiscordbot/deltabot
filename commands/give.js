@@ -4,6 +4,7 @@ module.exports = {
 	name: 'give',
 	description: 'Gives credits.',
 	guildOnly: true,
+	category: "eco",
 	args: true,
 	aliases: ['pay'],
 	execute(message, args) {

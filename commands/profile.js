@@ -5,6 +5,7 @@ module.exports = {
     name: 'profile',
     description: 'Check account profile.',
     guildOnly: true,
+    category: "eco",
     needsclient: true,
     execute(message, args, client) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {

@@ -6,6 +6,7 @@ module.exports = {
 	description: 'Play connect 4 with someone else. Must have another player. Default bet is 100.',
 	guildOnly: true,
 	cooldown: 3,
+	category: "eco",
 	usage: ['(opponent) [bet]'],
 	aliases: ['con4', 'con'],
 	execute(message, args) {

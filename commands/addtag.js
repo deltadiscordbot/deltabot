@@ -8,6 +8,7 @@ module.exports = {
     usage: ['(tag name) (tag content)'],
     aliases: ['createtag'],
     cooldown: 10,
+    category: "mod",
     needsmod: true,
     guildOnly: true,
     args: true,

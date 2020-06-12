@@ -4,6 +4,7 @@ module.exports = {
 	description: 'Links a direct install. (Mod only)',
 	needsmod: true,
 	aliases: ['di'],
+	category: "mod",
 	args: true,
 	execute(message, args) {
 		message.delete();

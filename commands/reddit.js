@@ -5,6 +5,7 @@ module.exports = {
     name: 'reddit',
     description: 'Gets a random post from a subreddit',
     usage: ['[subreddit]'],
+    category: "fun",
     args: true,
     guildOnly: true,
     aliases: ['r/'],

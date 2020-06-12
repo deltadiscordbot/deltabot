@@ -23,7 +23,7 @@ module.exports = {
                         })
                 } else {
                     message.delete();
-                    message.channel.send(items.content)
+                    message.channel.send(eval('`' + items.content + '`'))
                 }
                 db.close();
 

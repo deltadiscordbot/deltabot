@@ -6,6 +6,7 @@ module.exports = {
     description: 'Used for internal testing. (Owner only)',
     needsowner: true,
     cooldown: 1,
+    category: "owner",
     needsclient: true,
     execute(message, args, client) {
         MongoClient.connect(mongodbase, function(err, db) {

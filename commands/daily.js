@@ -4,6 +4,7 @@ module.exports = {
 	name: 'daily',
 	description: 'Gets daily credits.',
 	guildOnly: true,
+	category: "eco",
 	execute(message, args) {
 		MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
 			if (err) throw err;
