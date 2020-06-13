@@ -93,6 +93,7 @@ module.exports = {
                     .addField("Tic Tac Toe wins:", tttWins, true)
                     .addField("Last win:", lastWin, true)
                 message.channel.send(profileEmbed)
+                db.close();
             } else {
                 message.reply("that user does not have an account.")
             }

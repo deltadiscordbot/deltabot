@@ -255,7 +255,7 @@ module.exports = {
 						dbInstance.collection("users").updateOne(myobj2, newvalues2, function (err, res) {
 							if (err) throw err;
 						});
-
+						db.close();
 					}
 					let tttEmbed = new Discord.MessageEmbed()
 						.setTitle("Tic Tac Toe")

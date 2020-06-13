@@ -64,6 +64,7 @@ module.exports = {
                 .then(() => {
                     if (message.channel.type === 'dm') return;
                     message.reply('I\'ve sent you a DM with all my commands!');
+                    db.close();
                 })
                 .catch(error => {
                     console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
@@ -87,5 +88,7 @@ module.exports = {
         data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
 
         message.channel.send(data, { split: true });
+        db.close();
+
     },
 };

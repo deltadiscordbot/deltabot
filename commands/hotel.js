@@ -86,6 +86,7 @@ module.exports = {
                                                                                                         dbInstance.collection("hotel").insertOne(myobj, function (err, res) {
                                                                                                             if (err) throw err;
                                                                                                             msg.edit("Floor purchase complete.")
+                                                                                                            db.close();
                                                                                                         });
                                                                                                         const myobj2 = { id: message.author.id };
                                                                                                         const newBalance = user.balance - buyingPrice;
@@ -182,6 +183,7 @@ module.exports = {
                                                     dbInstance.collection("hotel").deleteOne(myobj3, function (err, res) {
                                                         if (err) throw err;
                                                         msg.edit(`Floor ${sellingFloor} was sold for ${sellingPrice}.`)
+                                                        db.close();
                                                     });
                                                 })
                                                 stopReact.on("collect", (r, u) => {
@@ -244,6 +246,7 @@ module.exports = {
                                 .setTimestamp()
                                 .setFooter(`Requested by: ${message.author.tag}`)
                             message.channel.send(embed)
+                            db.close();
                         });
                         break;
                     case "floors":
@@ -279,6 +282,7 @@ module.exports = {
                                 .setTimestamp()
                                 .setFooter(`Requested by: ${message.author.id}`)
                             message.channel.send(embed)
+                            db.close();
                         })
                         break;
                     default:
@@ -296,6 +300,7 @@ module.exports = {
                                         .setTimestamp()
                                         .setFooter(`Requested by: ${message.author.tag}`)
                                     message.channel.send(floorEmbed)
+                                    db.close();
                                 } else {
                                     message.reply("that floor is not owned.")
                                 }
@@ -311,6 +316,7 @@ module.exports = {
                     .setTimestamp()
                     .setFooter(`Requested by: ${message.author.tag}`)
                 message.channel.send(embed)
+                db.close();
             }
         })
     },

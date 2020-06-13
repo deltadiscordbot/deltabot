@@ -1,10 +1,22 @@
 {
     "prefix": "!",
-    "token":"token",
+    "token": "token",
     "mongodbase": "mongodb://localhost:27017",
     "currentdb": "deltabot",
     "mainSourceURL": "url",
     "alphaSourceURL": "url",
     "translateAPI": "translateAPI",
-    "ownerID": "ownerID"
+    "ownerID": "ownerID",
+    "twitterAPIKey": "apiKey",
+    "twitterAPISecret": "APIsecret",
+    "twitterAccessToken": "accessToken",
+    "twitterAccessSecret": "accessSecret",
+    "redditClientID": "clientID",
+    "redditClientSecret": "clientSecret",
+    "redditRefreshToken": "refreshToken",
+    "redditAccessToken": "accessToken",
+    "numbers": [],
+    "computers": [],
+    "versions": [],
+    "devices": []
 }
