@@ -24,6 +24,7 @@ module.exports = {
                                     if (floorData == null) {
                                         let ownedFloors = 0;
                                         let basePrice = 1000;
+                                        let complete = false;
                                         if (user.floorsOwned != undefined) {
                                             ownedFloors = user.floorsOwned;
                                         }
@@ -47,16 +48,20 @@ module.exports = {
                                                                 const msgCollector = message.channel.createMessageCollector(m => (m.author.id == message.author.id), { time: 30000 });
                                                                 msgCollector.on("collect", m => {
                                                                     floorName = m.content.toString();
+                                                                    complete = true;
                                                                     msgCollector.stop();
                                                                     m.delete()
                                                                         .then(msg2 => {
+                                                                            complete = false;
                                                                             msg.edit("Floor description:")
                                                                             const msgCollector = message.channel.createMessageCollector(m => (m.author.id == message.author.id), { time: 30000 });
                                                                             msgCollector.on("collect", m => {
                                                                                 floorDescription = m.content.toString().substring(0, 2048);
+                                                                                complete = true
                                                                                 msgCollector.stop();
                                                                                 m.delete()
                                                                                     .then(msg2 => {
+                                                                                        complete = false;
                                                                                         msg.edit("Floor icon:")
                                                                                         const msgCollector = message.channel.createMessageCollector(m => (m.author.id == message.author.id), { time: 30000 });
                                                                                         msgCollector.on("collect", m => {
@@ -72,12 +77,11 @@ module.exports = {
                                                                                             let floorIcon = "";
                                                                                             if (validURL(m.content.toString())) {
                                                                                                 floorIcon = m.content.toString();
+                                                                                                complete = true;
                                                                                                 msgCollector.stop();
                                                                                                 m.delete()
                                                                                                     .then(msg2 => {
-                                                                                                        if (user.con4Plays != undefined) {
-                                                                                                            totalPlays2 = user.con4Plays + 1;
-                                                                                                        }
+
                                                                                                         const myobj = { floor: buyingFloor, floorName: floorName, floorDescription: floorDescription, floorIcon: floorIcon, ownerID: message.author.id, ownerName: message.author.tag, price: buyingPrice };
                                                                                                         dbInstance.collection("hotel").insertOne(myobj, function (err, res) {
                                                                                                             if (err) throw err;
@@ -97,17 +101,23 @@ module.exports = {
                                                                                             }
                                                                                         })
                                                                                         msgCollector.on("end", e => {
-                                                                                            msg.edit("Floor purchase timed out.")
+                                                                                            if (!complete) {
+                                                                                                msg.edit("Floor purchase timed out.")
+                                                                                            }
                                                                                         })
                                                                                     })
                                                                             })
                                                                             msgCollector.on("end", e => {
-                                                                                msg.edit("Floor purchase timed out.")
+                                                                                if (!complete) {
+                                                                                    msg.edit("Floor purchase timed out.")
+                                                                                }
                                                                             })
                                                                         })
                                                                 })
                                                                 msgCollector.on("end", e => {
-                                                                    msg.edit("Floor purchase timed out.")
+                                                                    if (!complete) {
+                                                                        msg.edit("Floor purchase timed out.")
+                                                                    }
                                                                 })
                                                             })
                                                     })
@@ -228,12 +238,11 @@ module.exports = {
                                 sortedList += `${userList[index].name} - ${userList[index].floorsOwned}\n`
                             }
 
-                            db.close();
                             const embed = new Discord.MessageEmbed()
                                 .setTitle("DeltaBot Hotel Leaderboard")
                                 .setDescription(sortedList)
                                 .setTimestamp()
-                                .setFooter(`Requested by: ${message.author.id}`)
+                                .setFooter(`Requested by: ${message.author.tag}`)
                             message.channel.send(embed)
                         });
                         break;
@@ -303,7 +312,6 @@ module.exports = {
                     .setFooter(`Requested by: ${message.author.tag}`)
                 message.channel.send(embed)
             }
-            db.close();
         })
     },
 };
