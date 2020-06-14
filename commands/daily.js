@@ -22,10 +22,10 @@ module.exports = {
 			} else {
 				const two = user.dailytime
 				const dateNow = new Date();
-				// var millisecondsPerDay = 43_200_000;
+				// var millisecondsPerDay = 43_200_000; // remove ms checking in favour for day checking (avoids having to wait exactly 24h)
 				// var millisBetween = dateNow - two;
-				var date = [dateNow.getUTCDate(), dateNow.getUTCMonth()];
-                                // var month = dateNow.getUTCMonth();
+				var date = [dateNow.getUTCDate(), dateNow.getUTCMonth()]; // check time + month avoids issues with redeeming on the same day next month.
+                                // var month = dateNow.getUTCMonth();                    // redeeming in exactly one year is unlikely
 				if (date[0] != two[0] || date[1] != two[1]) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
