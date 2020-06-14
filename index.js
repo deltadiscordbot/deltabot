@@ -382,6 +382,56 @@ function createRR(message, array) {
     .on("error", error => console.log("error", error))
     .on("end", response => console.log("twitter stream ended"));
  */
+
+//This event listener handles all messages and gives credits to users
+client.on('message', message => {
+    if(message.author.bot) return; //Bots don't deserve credits.
+
+    if (!cooldowns.has("lastMessage")) {
+        cooldowns.set("lastMessage", new Discord.Collection());
+    }
+
+    const now = Date.now();
+    const timestamps = cooldowns.get('lastMessage');
+    const cooldownAmount = 60 * 1000;
+
+    if (timestamps.has(message.author.id)) {
+        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+        if (now < expirationTime) {
+            return;
+        }
+    }
+    timestamps.set(message.author.id, now);
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
+    try {
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
+            if (err) throw err;
+            dbInstance = db.db(currentdb);
+            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+            if (user == null) {
+                return;
+            } else {
+                let newbalance = user.balance + 50;
+                let newTotal = user.totalCredits + 50;
+                const myobj = { id: message.author.id };
+                const newvalues = { $set: { name: message.author.tag, balance: newbalance, totalCredits: newTotal } };
+                dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+                    if (err) throw err;
+                    return;
+                });
+            }
+            db.close();
+        });
+    } catch (error) {
+        console.error(error);
+        message.reply('There was an error while trying to manage xp!');
+    }
+})
+
+
+//This event listener handles all bot commands
 client.on('message', message => {
     if (!(message.content.startsWith(prefix) || message.mentions.users.first() == client.user) || message.author.bot) return;
     var args;
