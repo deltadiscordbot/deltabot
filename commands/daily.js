@@ -3,6 +3,7 @@ const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
 	name: 'daily',
 	description: 'Gets daily credits.',
+	aliases: ['redeem'],
 	guildOnly: true,
 	category: "eco",
 	execute(message, args) {
