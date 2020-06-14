@@ -21,14 +21,14 @@ module.exports = {
 			} else {
 				const two = user.dailytime
 				const dateNow = new Date();
-				var millisecondsPerDay = 43_200_000;
-				var millisBetween = dateNow - two;
-				var days = parseInt(millisecondsPerDay - millisBetween);
-				if (days = 0) {
+				// var millisecondsPerDay = 43_200_000;
+				// var millisBetween = dateNow - two;
+				var days = daysNow.getUTCDay();
+				if (days != two) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
-					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow, totalCredits: newTotal } };
+					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow.getUTCDay(), totalCredits: newTotal } };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
 						message.reply(`\`1,000\` daily credits redeemed. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
