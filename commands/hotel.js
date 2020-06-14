@@ -102,21 +102,21 @@ module.exports = {
                                                                                             }
                                                                                         })
                                                                                         msgCollector.on("end", e => {
-                                                                                            if (!complete) {
+                                                                                            if (e == "time") {
                                                                                                 msg.edit("Floor purchase timed out.")
                                                                                             }
                                                                                         })
                                                                                     })
                                                                             })
                                                                             msgCollector.on("end", e => {
-                                                                                if (!complete) {
+                                                                                if (e == "time") {
                                                                                     msg.edit("Floor purchase timed out.")
                                                                                 }
                                                                             })
                                                                         })
                                                                 })
                                                                 msgCollector.on("end", e => {
-                                                                    if (!complete) {
+                                                                    if (e == "time") {
                                                                         msg.edit("Floor purchase timed out.")
                                                                     }
                                                                 })
@@ -287,7 +287,7 @@ module.exports = {
                         break;
                     default:
                         if (args.length == 1) {
-                            if (!isNaN(args[0])) {
+                            if (!isNaN(args[0]) || args[0].toLowerCase() === "nan") {
                                 const getFloor = parseInt(args[0]);
                                 const floorData = await dbInstance.collection("hotel").findOne({ floor: getFloor });
                                 if (floorData != null) {
