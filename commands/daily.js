@@ -26,7 +26,7 @@ module.exports = {
 				// var millisBetween = dateNow - two;
 				var date = [dateNow.getUTCDate(), dateNow.getUTCMonth()];
                                 // var month = dateNow.getUTCMonth();
-				if (date[0] != two[0] || date[1] != two[0]) {
+				if (date[0] != two[0] || date[1] != two[1]) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
