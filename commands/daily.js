@@ -24,12 +24,13 @@ module.exports = {
 				const dateNow = new Date();
 				// var millisecondsPerDay = 43_200_000;
 				// var millisBetween = dateNow - two;
-				var days = daysNow.getUTCDay();
-				if (days != two) {
+				var date = [dateNow.getUTCDate(), dateNow.getUTCMonth()];
+                                // var month = dateNow.getUTCMonth();
+				if (date[0] != two[0] || date[1] != two[0]) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
-					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow.getUTCDay(), totalCredits: newTotal } };
+					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow.getUTCDate(), totalCredits: newTotal } };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
 						message.reply(`\`1,000\` daily credits redeemed. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
