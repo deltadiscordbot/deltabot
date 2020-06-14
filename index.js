@@ -385,7 +385,7 @@ function createRR(message, array) {
 
 //This event listener handles all messages and gives credits to users
 client.on('message', message => {
-    if(message.author.bot) return; //Bots don't deserve credits.
+    if (message.author.bot) return; //Bots don't deserve credits.
 
     if (!cooldowns.has("lastMessage")) {
         cooldowns.set("lastMessage", new Discord.Collection());
@@ -413,10 +413,15 @@ client.on('message', message => {
             if (user == null) {
                 return;
             } else {
-                let newbalance = user.balance + 50;
-                let newTotal = user.totalCredits + 50;
+                const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
+                const newbalance = user.balance + randCredits;
+                const newTotal = user.totalCredits + randCredits;
+                let talkCredits = 0;
+                if (user.talkCredits != undefined) {
+                    talkCredits = user.talkCredits + randCredits;
+                }
                 const myobj = { id: message.author.id };
-                const newvalues = { $set: { name: message.author.tag, balance: newbalance, totalCredits: newTotal } };
+                const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
                 dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                     if (err) throw err;
                     return;

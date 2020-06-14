@@ -102,21 +102,21 @@ module.exports = {
                                                                                             }
                                                                                         })
                                                                                         msgCollector.on("end", e => {
-                                                                                            if (!complete) {
+                                                                                            if (e == "time") {
                                                                                                 msg.edit("Floor purchase timed out.")
                                                                                             }
                                                                                         })
                                                                                     })
                                                                             })
                                                                             msgCollector.on("end", e => {
-                                                                                if (!complete) {
+                                                                                if (e == "time") {
                                                                                     msg.edit("Floor purchase timed out.")
                                                                                 }
                                                                             })
                                                                         })
                                                                 })
                                                                 msgCollector.on("end", e => {
-                                                                    if (!complete) {
+                                                                    if (e == "time") {
                                                                         msg.edit("Floor purchase timed out.")
                                                                     }
                                                                 })

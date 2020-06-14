@@ -41,6 +41,7 @@ module.exports = {
                 let con4Wins = 0;
                 let tttPlays = 0;
                 let tttWins = 0;
+                let talkCredits = 0;
                 let floorsOwned = "";
                 if (user.lastWin != undefined) {
                     lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -66,6 +67,9 @@ module.exports = {
                 if (user.tttWins != undefined) {
                     tttWins = user.tttWins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
+                if (user.talkCredits != undefined) {
+                    talkCredits = user.talkCredits.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
                 if (user.tttPlays != undefined) {
                     tttPlays = user.tttPlays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
@@ -83,6 +87,7 @@ module.exports = {
                     .setColor(user.color)
                     .addField("Balance:", balance, true)
                     .addField("Total earnings:", totalCredits, true)
+                    .addField("Message earnings:", talkCredits, true)
                     .addField("Hotel floors owned:", floorsOwned.substring(0, floorsOwned.length - 2), true)
                     .addField("Default bet:", defaultBet, true)
                     .addField("Slots plays:", slotsPlays, true)

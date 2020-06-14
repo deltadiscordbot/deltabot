@@ -5,7 +5,6 @@ module.exports = {
 	description: 'Gets credits balance.',
 	guildOnly: true,
 	category: "eco",
-	cooldown: 30,
 	aliases: ['bal'],
 	execute(message, args) {
 		MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
