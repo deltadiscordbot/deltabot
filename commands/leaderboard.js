@@ -46,6 +46,7 @@ module.exports = {
                     .setTimestamp()
                     .setFooter(`Requested by: ${message.author.tag}`)
                 message.channel.send(embed)
+                db.close();
             });
 
         });
