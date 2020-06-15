@@ -13,7 +13,7 @@ module.exports = {
 			const user = await dbInstance.collection("users").findOne({ id: message.author.id });
 			if (user == null) {
 				const dateNow = new Date();
-				var myobj = { id: message.author.id, name: message.author.tag, balance: 1000, dailytime: [dateNow.getUTCDate(), dateNow.getUTCMonth()], totalCredits: 1000, color: "#000000", slotsPlays: 0, blackjackPlays: 0, lastWin: 0 };
+				var myobj = { id: message.author.id, name: message.author.tag, balance: 1000, dailytime: dateNow.setUTCHours(0,0,0,0), totalCredits: 1000, color: "#000000", slotsPlays: 0, blackjackPlays: 0, lastWin: 0 };
 				dbInstance.collection("users").insertOne(myobj, function (err, res) {
 					if (err) throw err;
 					message.reply(`account created. \`1,000\` credits were added to your balance.`)
@@ -24,13 +24,12 @@ module.exports = {
 				const dateNow = new Date();
 				// var millisecondsPerDay = 43_200_000; // remove ms checking in favour for day checking (avoids having to wait exactly 24h)
 				// var millisBetween = dateNow - two;
-				var date = [dateNow.getUTCDate(), dateNow.getUTCMonth()]; // check time + month avoids issues with redeeming on the same day next month.
-				// var month = dateNow.getUTCMonth();                    // redeeming in exactly one year is unlikely
-				if (date[0] != two[0] || date[1] != two[1]) {
+				var date = dateNow.setUTCHours(0,0,0,0); // check time - hours avoids issues with redeeming on the same day in a later month or year
+				if (date != two) {
 					let newbalance = user.balance + 1000;
 					let newTotal = user.totalCredits + 1000;
 					const myobj = { id: message.author.id };
-					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: [dateNow.getUTCDate(), dateNow.getUTCMonth()], totalCredits: newTotal } };
+					const newvalues = { $set: { name: message.author.tag, balance: newbalance, dailytime: dateNow.setUTCHours(0,0,0,0), totalCredits: newTotal } };
 					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
 						message.reply(`\`1,000\` daily credits redeemed. Your new balance is \`${newbalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\`.`)
