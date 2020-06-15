@@ -15,6 +15,7 @@
     "redditClientSecret": "clientSecret",
     "redditRefreshToken": "refreshToken",
     "redditAccessToken": "accessToken",
+    "catAPIKey": "apiKey",
     "numbers": [],
     "computers": [],
     "versions": [],
