@@ -86,11 +86,13 @@ module.exports = {
                                                                                                         dbInstance.collection("hotel").insertOne(myobj, function (err, res) {
                                                                                                             if (err) throw err;
                                                                                                             msg.edit("Floor purchase complete.")
-                                                                                                            db.close();
                                                                                                         });
                                                                                                         const myobj2 = { id: message.author.id };
                                                                                                         const newBalance = user.balance - buyingPrice;
-                                                                                                        const newFloorsOwned = ownedFloors + 1;
+                                                                                                        let newFloorsOwned = 1;
+                                                                                                        if(user.floorsOwned!=undefined){
+                                                                                                            newFloorsOwned = user.floorsOwned + 1;
+                                                                                                        }
                                                                                                         const newvalues = { $set: { balance: newBalance, floorsOwned: newFloorsOwned } };
                                                                                                         dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
                                                                                                             if (err) throw err;
@@ -183,7 +185,6 @@ module.exports = {
                                                     dbInstance.collection("hotel").deleteOne(myobj3, function (err, res) {
                                                         if (err) throw err;
                                                         msg.edit(`Floor ${sellingFloor} was sold for ${sellingPrice}.`)
-                                                        db.close();
                                                     });
                                                 })
                                                 stopReact.on("collect", (r, u) => {
@@ -246,7 +247,6 @@ module.exports = {
                                 .setTimestamp()
                                 .setFooter(`Requested by: ${message.author.tag}`)
                             message.channel.send(embed)
-                            db.close();
                         });
                         break;
                     case "floors":
@@ -275,14 +275,12 @@ module.exports = {
                             for (let index = 0; index < floorList.length; index++) {
                                 sortedList += `${floorList[index].floor} - ${floorList[index].ownerName}\n`
                             }
-                            db.close();
                             const embed = new Discord.MessageEmbed()
                                 .setTitle("DeltaBot Hotel Floors")
                                 .setDescription(sortedList)
                                 .setTimestamp()
                                 .setFooter(`Requested by: ${message.author.id}`)
                             message.channel.send(embed)
-                            db.close();
                         })
                         break;
                     default:
@@ -300,7 +298,6 @@ module.exports = {
                                         .setTimestamp()
                                         .setFooter(`Requested by: ${message.author.tag}`)
                                     message.channel.send(floorEmbed)
-                                    db.close();
                                 } else {
                                     message.reply("that floor is not owned.")
                                 }
@@ -316,7 +313,6 @@ module.exports = {
                     .setTimestamp()
                     .setFooter(`Requested by: ${message.author.tag}`)
                 message.channel.send(embed)
-                db.close();
             }
         })
     },

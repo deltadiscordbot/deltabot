@@ -5,7 +5,7 @@ module.exports = {
 	name: 'translate',
 	description: 'Translates text. Uses two character langauge codes or full language name.',
 	args: true,
-	usage:"[fromLan] [toLan] text",
+	usage: "[fromLan] [toLan] text",
 	aliases: ['tr'],
 	guildOnly: true,
 	async execute(message, args) {
@@ -17,10 +17,10 @@ module.exports = {
 			translate.from = lanFrom;
 			translate.to = lanTo;
 			translate.cache = 10;
-			const translation = await translate(args.join(" "));
+			const translation = await translate(args.join(" ").substring(0, 1024));
 			const translationEmbed = new Discord.MessageEmbed()
-				.addField(`Original (${lanFrom}):`, args.join(" "))
-				.addField(`Translated (${lanTo}):`, translation)
+				.addField(`Original (${lanFrom}):`, args.join(" ").substring(0, 1024))
+				.addField(`Translated (${lanTo}):`, translation.substring(0, 1024))
 				.setTimestamp()
 				.setFooter('Requested by: ' + message.author.tag);
 			message.channel.send(translationEmbed)
