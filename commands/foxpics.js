@@ -6,7 +6,7 @@ module.exports = {
     description: 'Get a random picture of a fox!',
     category: "fun",
     guildOnly: true,
-    aliases: ['fox', 'foxes'],
+    aliases: ['fox', 'foxes', 'foxy', 'foxpic', 'foxxo', 'foxxos'],
     async execute(message, args) {
             const dogAPI = 'https://randomfox.ca/floof/?ref=apilist.fun';
             fetch(dogAPI, settings)

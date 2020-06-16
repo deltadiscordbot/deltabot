@@ -12,7 +12,7 @@ module.exports = {
     name: 'catpics',
     description: 'Get a picture of a cat. You can even specify a breed.',
     usage: "[optionalBreed]",
-    aliases: ['cat', 'cats'],
+    aliases: ['cat', 'cats', 'catto', 'cattos', 'kitty', 'kitties', 'kitten', 'kittens'],
     guildOnly: true,
     async execute(message, args) {
 		//Check the user has specified a breed
