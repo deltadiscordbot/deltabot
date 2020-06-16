@@ -6,7 +6,7 @@ module.exports = {
     description: 'Get a random picture of a dog!',
     category: "fun",
     guildOnly: true,
-    aliases: ['dog', 'dogs'],
+    aliases: ['dog', 'dogs', 'doggo', 'doggos', 'puppy', 'puppies', 'pupper', 'puppers'],
     async execute(message, args) {
         if (args.length) {
             const dogAPI = `https://dog.ceo/api/breed/${args[0].toString()}/images/random/`;

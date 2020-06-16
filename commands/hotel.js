@@ -6,7 +6,7 @@ module.exports = {
     description: 'Visit DeltaBot Hotel. \`!hotel\` for a guide.',
     guildOnly: true,
     category: "eco",
-    aliases: ['floor'],
+    aliases: ['floor', 'floors'],
     execute(message, args) {
         MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
             if (err) throw err;

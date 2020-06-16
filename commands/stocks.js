@@ -9,7 +9,7 @@ module.exports = {
     description: 'Play the stock market.',
     category: "eco",
     guildOnly: true,
-    aliases: ['stonks', 'stock', 'stonk'],
+    aliases: ['stonks', 'stock', 'stonk', 'stonx', 'stonxmarket', 'stonksmarket', 'stockmarket'],
     execute(message, args) {
         const finnhub = require('finnhub');
         const defaultClient = finnhub.ApiClient.instance;
