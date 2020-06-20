@@ -185,8 +185,8 @@ module.exports = {
                                                                 if (user.totalStocks != undefined) {
                                                                     totalStocks = user.totalStocks - sellingAmount;
                                                                 }
-                                                                const newTotalEarnings = user.totalCredits + (sellingAmount - totalPurchase);
-                                                                const newvalues = { $set: { balance: newBalance, totalStocks: totalStocks, totalCredits: newTotalEarnings } };
+                                                                //const newTotalEarnings = user.totalCredits + (sellingAmount - totalPurchase);
+                                                                const newvalues = { $set: { balance: newBalance, totalStocks: totalStocks } };
                                                                 dbInstance.collection("users").updateOne(myobj3, newvalues, function (err, res) {
                                                                     if (err) throw err;
                                                                     msg.edit(`${message.author}, sale complete. New balance is ${newBalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`)
@@ -229,6 +229,7 @@ module.exports = {
                 case "info":
                     let stockPrices;
                     let companyInfo;
+                    if(args.length){
                     const symbol = args[0].toString().toUpperCase();
                     api.quote(symbol, (error, data, response) => {
                         if (error) {
@@ -248,7 +249,7 @@ module.exports = {
                                         companyName = companyInfo.name;
                                         companyLogo = companyInfo.logo;
                                     }
-                                    if (stockPrices.c == 0) {
+                                    if (isNaN(stockPrices.c) || stockPrices.c == 0) {
                                         message.reply("error finding stock.")
                                     } else {
                                         const embed = new Discord.MessageEmbed()
@@ -265,6 +266,9 @@ module.exports = {
                             })
                         }
                     })
+                }else{
+                    message.reply("please specify a symbol.")
+                }
                     break;
                 case "search":
                 case "find":
@@ -287,15 +291,6 @@ module.exports = {
                     break;
                 case "list":
                 case "portfolio":
-                    /* function getPrice(symbol) {
-                        api.quote(symbol, (error, data, response) => {
-                            if (error) {
-                                console.error(error);
-                            } else {
-                                return parseInt((data.c * 10));
-                            }
-                        });
-                    } */
                     MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
                         if (err) throw err;
                         const dbInstance = db.db(currentdb);
@@ -313,21 +308,29 @@ module.exports = {
                                     stockCounts.push(parseInt(element.shareCount));
                                 }
                             });
-                            let c = "";
-                            /* stockSymbols.forEach(element => {
-                                stockPrices.push(parseInt(getPrice(element)))
-                            }); */
-                            let embedList = "";
                             for (let index = 0; index < stockSymbols.length; index++) {
-                                if (stockCounts[index] != 0) {
-                                    embedList += `${stockSymbols[index]} - ${stockCounts[index]}\n`//- ${(parseInt(stockPrices[index]) * parseInt(stockCounts[index]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))}\n`
-                                }
+                                api.quote(stockSymbols[index], (error, data, response) => {
+                                    if (error) {
+                                        console.error(error);
+                                    } else {
+                                        stockPrices.push((parseInt(data["c"]) * 10));
+                                    }
+                                    if (index >= stockSymbols.length - 1) {
+                                        let embedList = "";
+                                        console.log(stockPrices)
+                                        for (let index = 0; index < stockSymbols.length; index++) {
+                                            if (stockCounts[index] != 0) {
+                                                embedList += `${stockSymbols[index]} - ${stockCounts[index]} - ${(stockPrices[index] * stockCounts[index]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\n`
+                                            }
+                                        }
+                                        const embed = new Discord.MessageEmbed()
+                                            .setTitle("Portfolio")
+                                            .setDescription(embedList)
+                                            .setTimestamp()
+                                        message.channel.send(embed)
+                                    }
+                                });
                             }
-                            const embed = new Discord.MessageEmbed()
-                                .setTitle("Portfolio")
-                                .setDescription(embedList)
-                                .setTimestamp()
-                            message.channel.send(embed)
                         } else {
                             message.reply("you do not have an account. Make one with \`!daily\`.");
                             return;
@@ -348,11 +351,5 @@ module.exports = {
                 .setDescription("\`!stocks buy [symbol]\` to buy a stock.\n\`!stocks sell [symbol]\` to sell a stock you own.\n\`!stocks lookup [symbol]\` to get information on a stock.\n\`!stocks search [search]\` to search for a company.")
             message.reply(embed)
         }
-/*         api.quote("AAPL", (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-            }
-        });
- */    },
+    },
 };

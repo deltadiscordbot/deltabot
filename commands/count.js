@@ -5,8 +5,7 @@ module.exports = {
     description: 'Get member count of roles.',
     cooldown: 10,
     guildOnly: true,
-    needsclient: true,
-    execute(message, args, client) {
+    execute(message, args) {
         let roleNameList = computers.concat(devices);
         roleNameList = roleNameList.concat(versions);
         let embedBody = '';

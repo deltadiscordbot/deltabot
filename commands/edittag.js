@@ -2,11 +2,11 @@ var MongoClient = require('mongodb').MongoClient;
 const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
     name: 'edittag',
-    description: 'Edits a help tag. (Mod only)',
+    description: 'Edits a help tag. (Helper only)',
     usage: ['(tag name) (tag content)'],
     cooldown: 10,
     aliases: ['changetag'],
-    needsmod: true,
+    needshelper: true,
     category: "mod",
     guildOnly: true,
     args: true,

@@ -4,12 +4,12 @@ const package = require('../package.json');
 const Discord = require('discord.js');
 module.exports = {
     name: 'addtag',
-    description: 'Add a help tag. (Mod only)',
+    description: 'Add a help tag. (Helper only)',
     usage: ['(tag name) (tag content)'],
     aliases: ['createtag'],
     cooldown: 10,
     category: "mod",
-    needsmod: true,
+    needshelper: true,
     guildOnly: true,
     args: true,
     execute(message, args) {

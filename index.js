@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 let { prefix } = require('./config.json');
-const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken, token, mongodbase, currentdb, numbers, computers, devices, versions } = require('./config.json');
+const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken, token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
@@ -17,7 +17,7 @@ let twitterchannels = [];
 const betaRole = "<@&716483174028410962>";
 const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
-let altstoreApps, dbInstance, welcomechannelID, modRoles, logChannelID, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
+let altstoreApps, dbInstance, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 const twitterClient = new Twitter({
     consumer_key: twitterAPIKey,
@@ -38,28 +38,38 @@ function updateVersions() {
             const randomActivity = consoles[Math.floor(Math.random() * consoles.length)];
             client.user.setActivity(randomActivity + ` with ${client.users.cache.size} others!`, { type: 'PLAYING' });
 
-            // do something with JSON
             altstoreApps = json;
             for (var i = 0; i < altstoreApps['apps'].length; i++) {
-                // look for the entry with a matching `bundleID` value
-                if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore") {
-                    // we found AltStore
-                    newAltstoreData = altstoreApps['apps'][i];
-                } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta") {
-                    // we found delta
-                    newDeltaData = altstoreApps['apps'][i];
-                } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Beta") {
-                    // we found altstore beta
-                    newAltstoreBetaData = altstoreApps['apps'][i];
-                } else if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Beta") {
-                    // we found Delta beta
-                    newDeltaBetaData = altstoreApps['apps'][i];
+                switch (altstoreApps['apps'][i].bundleIdentifier) {
+                    case "com.rileytestut.AltStore":
+                        newAltstoreData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.Delta":
+                        newDeltaData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.AltStore.Beta":
+                        newAltstoreBetaData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.Delta.Beta":
+                        newDeltaBetaData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.Clip.Beta":
+                        newClipBetaData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.Clip":
+                    newClipData = altstoreApps['apps'][i];
+                    break;
+                    
+                    default:
+                        break;
                 }
             }
             newAltstoreVersion = newAltstoreData['version'];
             newDeltaVersion = newDeltaData['version'];
             newAltstoreBetaVersion = newAltstoreBetaData['version'];
             newDeltaBetaVersion = newDeltaBetaData['version'];
+            newClipBetaVersion = newClipBetaData['version'];
+            newClipVersion = newClipData['version'];
 
             MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {
                 if (err) throw err;
@@ -156,6 +166,51 @@ function updateVersions() {
                         });
                     });
                 }
+                //clip Beta
+                if (newClipBetaVersion != oldClipBetaVersion) {
+                    appsList[6] = newClipBetaVersion;
+                    var myquery = { name: "versions" };
+                    var newvalue = { $set: { apps: appsList } };
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                        if (err) throw err;
+                        updateVars();
+                        const modEmbed = new Discord.MessageEmbed()
+                            .setColor('#EC008C')
+                            .setThumbnail(newClipBetaData['iconURL'])
+                            .setTitle("New Clip Beta update!")
+                            .addField("Version:", `${oldClipBetaVersion} -> ${newClipBetaVersion}`, true)
+                            .addField("What's new:", newClipBetaData['versionDescription'].substring(0, 1024))
+                            .setTimestamp()
+                            .setFooter(package.name + ' v. ' + package.version);
+                        betaannounceChannels.forEach(element => {
+                            element.send(betaRole)
+                                .then(msg => {
+                                    msg.edit(modEmbed);
+                                })
+                        });
+                    });
+                }
+                //clip 
+                if (newClipVersion != oldClipVersion) {
+                    appsList[7] = newClipVersion;
+                    var myquery = { name: "versions" };
+                    var newvalue = { $set: { apps: appsList } };
+                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                        if (err) throw err;
+                        updateVars();
+                        const modEmbed = new Discord.MessageEmbed()
+                            .setColor('#EC008C')
+                            .setThumbnail(newClipData['iconURL'])
+                            .setTitle("New Clip update!")
+                            .addField("Version:", `${oldClipVersion} -> ${newClipVersion}`, true)
+                            .addField("What's new:", newClipData['versionDescription'].substring(0, 1024))
+                            .setTimestamp()
+                            .setFooter(package.name + ' v. ' + package.version);
+                        announceChannels.forEach(element => {
+                            element.send(modEmbed);
+                        });
+                    });
+                }
             });
         });
 
@@ -164,14 +219,14 @@ function updateVersions() {
         .then((json) => {
             var altstoreApps = json;
             for (var i = 0; i < altstoreApps['apps'].length; i++) {
-                // look for the entry with a matching `bundleID` value
-                if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.AltStore.Alpha") {
-                    // we found AltStore alpha
-                    newAltstoreData = altstoreApps['apps'][i];
-                }
-                if (altstoreApps['apps'][i].bundleIdentifier == "com.rileytestut.Delta.Alpha") {
-                    // we found Delta alpha
-                    newDeltaData = altstoreApps['apps'][i];
+                switch (altstoreApps['apps'][i].bundleIdentifier) {
+                    case "com.rileytestut.AltStore.Alpha":
+                        newAltstoreData = altstoreApps['apps'][i];
+                        break;
+                    case "com.rileytestut.Delta.Alpha":
+                        newDeltaData = altstoreApps['apps'][i];
+                    default:
+                        break;
                 }
             }
             newAltstoreVersion = newAltstoreData['version'];
@@ -240,17 +295,20 @@ function updateVars() {
         dbInstance = db.db(currentdb);
         const dataItems = await dbInstance.collection('data').findOne({});
         appsList = dataItems.apps;
-        //appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta
+        //     appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
         oldAltstoreVersion = appsList[0];
         oldDeltaVersion = appsList[1];
         oldAltstoreBetaVersion = appsList[2];
         oldDeltaBetaVersion = appsList[3];
         oldAltstoreAlphaVersion = appsList[4];
         oldDeltaAlphaVersion = appsList[5];
+        oldClipBetaVersion = appsList[6];
+        oldClipVersion = appsList[7];
         const items = await dbInstance.collection('config').findOne({});
         prefix = items.prefix;
         welcomechannelID = items.welcomechannel;
         modRoles = items.modroles;
+        helperRoles = items.helperroles;
         logChannelID = items.logchannel;
         var index = 0;
         items.announcechannel.forEach(element => {
@@ -313,6 +371,10 @@ function initReactionRoles() {
         .then(deviceMessage => {
             createRR(deviceMessage, devices);
         });
+    deltaRoleChannel.messages.fetch("722562577669816431") //alerts in delta
+        .then(alertsMessage => {
+            createRR(alertsMessage, deltaAlerts);
+        });
 
     altstoreRoleChannel = client.channels.cache.get("719294939451621377");
     altstoreRoleChannel.messages.fetch("719296388311285861") //computers in altstore
@@ -326,6 +388,10 @@ function initReactionRoles() {
     altstoreRoleChannel.messages.fetch("719296390358106153") //devices in altstore
         .then(deviceMessage => {
             createRR(deviceMessage, devices);
+        });
+    altstoreRoleChannel.messages.fetch("722562517901115494") //alerts in altstore
+        .then(alertsMessage => {
+            createRR(alertsMessage, altstoreAlerts);
         });
 }
 function createRR(message, array) {
@@ -485,8 +551,38 @@ client.on('message', message => {
             const argshelp = [command.name];
             commandhelp.execute(message, argshelp)
         } else {
-            if (command.needsmod) {
-                var isMod = false;
+            if (command.needshelper) {
+                let isHelper = false;
+                if (message.author.id == ownerID) {
+                    isHelper = true;
+                }
+                modRoles.forEach(element => {
+                    if (message.member.roles.cache.has(element) || message.member.hasPermission(['ADMINISTRATOR'])) {
+                        isHelper = true;
+
+                    }
+                    if (isHelper) {
+                        console.log("mod")
+                        return
+                    };
+                });
+                helperRoles.forEach(element => {
+                    if (message.member.roles.cache.has(element) || message.member.hasPermission(['ADMINISTRATOR'])) {
+                        isHelper = true;
+                    }
+                    if (isHelper) {
+                        console.log("helper")
+                        return
+                    };
+                })
+                if (!isHelper) {
+                    message.channel.send("You do not have permission to use this command.");
+                    return;
+                } else {
+                    exeCommand(command, message, args);
+                }
+            } else if (command.needsmod) {
+                let isMod = false;
                 if (message.author.id == ownerID) {
                     isMod = true;
                 }
