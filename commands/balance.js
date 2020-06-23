@@ -30,7 +30,12 @@ module.exports = {
 				message.reply(`${userObject.tag} does not have an account. Do \`!daily\` to make one.`)
 				db.close();
 			} else {
-				message.reply(`${userObject.tag} has ${user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} credits.`)
+				if (userObject == message.author) {
+					message.reply(`you have ${user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} credits.`)
+
+				} else {
+					message.reply(`${userObject.tag} has ${user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} credits.`)
+				}
 			}
 			db.close();
 		});

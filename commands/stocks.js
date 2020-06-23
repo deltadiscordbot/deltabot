@@ -20,6 +20,7 @@ module.exports = {
             const command = args.shift();
             switch (command.toString().toLowerCase()) {
                 case "buy":
+                case "b":
                 case "purchase":
                     MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
                         if (err) throw err;
@@ -109,6 +110,7 @@ module.exports = {
                         }
                     })
                     break;
+                case "s":
                 case "sell":
                     MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
                         if (err) throw err;
@@ -225,51 +227,53 @@ module.exports = {
                     });
                     break;
                 case "lookup":
+                case "l":
                 case "check":
                 case "info":
                     let stockPrices;
                     let companyInfo;
-                    if(args.length){
-                    const symbol = args[0].toString().toUpperCase();
-                    api.quote(symbol, (error, data, response) => {
-                        if (error) {
-                            console.error(error);
-                        } else {
-                            stockPrices = data;
-                            api.companyProfile2({ symbol: symbol }, (error, data, response) => {
-                                if (error) {
-                                    console.error(error);
-                                } else {
-                                    companyInfo = data;
-                                    let companyName = "";
-                                    let companyLogo = '';
-                                    if (companyInfo.name == undefined) {
-                                        companyName = symbol
+                    if (args.length) {
+                        const symbol = args[0].toString().toUpperCase();
+                        api.quote(symbol, (error, data, response) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                stockPrices = data;
+                                api.companyProfile2({ symbol: symbol }, (error, data, response) => {
+                                    if (error) {
+                                        console.error(error);
                                     } else {
-                                        companyName = companyInfo.name;
-                                        companyLogo = companyInfo.logo;
+                                        companyInfo = data;
+                                        let companyName = "";
+                                        let companyLogo = '';
+                                        if (companyInfo.name == undefined) {
+                                            companyName = symbol
+                                        } else {
+                                            companyName = companyInfo.name;
+                                            companyLogo = companyInfo.logo;
+                                        }
+                                        if (isNaN(stockPrices.c) || stockPrices.c == 0) {
+                                            message.reply("error finding stock.")
+                                        } else {
+                                            const embed = new Discord.MessageEmbed()
+                                                .setTitle(companyName)
+                                                .setThumbnail(companyLogo)
+                                                .addField("Current price", (stockPrices.c * 10).toFixed(0), true)
+                                                .addField("High price", (stockPrices.h * 10).toFixed(0), true)
+                                                .addField("Low price", (stockPrices.l * 10).toFixed(0), true)
+                                                .addField("Opening price", (stockPrices.o * 10).toFixed(0), true)
+                                                .addField("Last close price", (stockPrices.pc * 10).toFixed(0), true)
+                                            message.reply(embed)
+                                        }
                                     }
-                                    if (isNaN(stockPrices.c) || stockPrices.c == 0) {
-                                        message.reply("error finding stock.")
-                                    } else {
-                                        const embed = new Discord.MessageEmbed()
-                                            .setTitle(companyName)
-                                            .setThumbnail(companyLogo)
-                                            .addField("Current price", (stockPrices.c * 10).toFixed(0), true)
-                                            .addField("High price", (stockPrices.h * 10).toFixed(0), true)
-                                            .addField("Low price", (stockPrices.l * 10).toFixed(0), true)
-                                            .addField("Opening price", (stockPrices.o * 10).toFixed(0), true)
-                                            .addField("Last close price", (stockPrices.pc * 10).toFixed(0), true)
-                                        message.reply(embed)
-                                    }
-                                }
-                            })
-                        }
-                    })
-                }else{
-                    message.reply("please specify a symbol.")
-                }
+                                })
+                            }
+                        })
+                    } else {
+                        message.reply("please specify a symbol.")
+                    }
                     break;
+                case "s":
                 case "search":
                 case "find":
                     const searchAPI = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${args.join(" ")}&apikey=${stocksSearchAPIKey}`;
@@ -289,6 +293,7 @@ module.exports = {
                             message.channel.send(embed)
                         })
                     break;
+                case "p":
                 case "list":
                 case "portfolio":
                     MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
