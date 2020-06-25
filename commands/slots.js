@@ -95,7 +95,7 @@ module.exports = {
 								dbInstance = db.db(currentdb);
 								const newBalance = user.balance - bet + winnings;
 								const newTotal = user.totalCredits + winnings;
-								let totalPlays = 0;
+								let totalPlays = 1;
 								let lastWin = user.lastWin;
 								if (winnings > 0) {
 									lastWin = winnings

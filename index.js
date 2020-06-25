@@ -57,9 +57,9 @@ function updateVersions() {
                         newClipBetaData = altstoreApps['apps'][i];
                         break;
                     case "com.rileytestut.Clip":
-                    newClipData = altstoreApps['apps'][i];
-                    break;
-                    
+                        newClipData = altstoreApps['apps'][i];
+                        break;
+
                     default:
                         break;
                 }
@@ -371,10 +371,10 @@ function initReactionRoles() {
         .then(deviceMessage => {
             createRR(deviceMessage, devices);
         });
-    deltaRoleChannel.messages.fetch("722562577669816431") //alerts in delta
+    /* deltaRoleChannel.messages.fetch("722562577669816431") //alerts in delta
         .then(alertsMessage => {
             createRR(alertsMessage, deltaAlerts);
-        });
+        }); */
 
     altstoreRoleChannel = client.channels.cache.get("719294939451621377");
     altstoreRoleChannel.messages.fetch("719296388311285861") //computers in altstore

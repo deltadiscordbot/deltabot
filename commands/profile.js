@@ -39,6 +39,7 @@ module.exports = {
                 let defaultBet = 100;
                 let con4Plays = 0;
                 let con4Wins = 0;
+                let cfPlays = 0;
                 let tttPlays = 0;
                 let tttWins = 0;
                 let talkCredits = 0;
@@ -60,6 +61,9 @@ module.exports = {
                 }
                 if (user.con4Wins != undefined) {
                     con4Wins = user.con4Wins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+                if (user.coinflipplays != undefined) {
+                    cfPlays = user.coinflipplays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 if (user.con4Plays != undefined) {
                     con4Plays = user.con4Plays.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -96,6 +100,7 @@ module.exports = {
                     .addField("Connect 4 wins:", con4Wins, true)
                     .addField("Tic Tac Toe plays:", tttPlays, true)
                     .addField("Tic Tac Toe wins:", tttWins, true)
+                    .addField("Coin flip plays:", cfPlays, true)
                     .addField("Last win:", lastWin, true)
                 message.channel.send(profileEmbed)
                 db.close();
