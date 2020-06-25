@@ -29,7 +29,7 @@ module.exports = {
                 bet = parseInt(user.defaultBet.toString().replace(",", "."));
             }
             //Check if user has enough money to bet
-            if (user.balance < bet) return message.reply("You don't have enough money, scrub!");
+            if (user.balance < bet) return message.reply("You don't have enough credits, scrub!");
             //Check what side of the coin the user is betting on
             switch (args[0].toLowerCase()){
                 case "heads":
@@ -60,8 +60,10 @@ module.exports = {
                 dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                     if (err) throw err;
                     let resultMessage = new Discord.MessageEmbed()
-                    .setTitle(userWon ? `You won \$${bet}` : `You lost \$${bet}`)
+                    .setTitle(userWon ? `You won ${bet} credits` : `You lost ${bet} credits`)
                     .setImage(icons[randomSelection])
+		    .setTimestamp()
+		    .setFooter(`Bet: ${bet} | Requested by: ${message.author.tag}`)
                     message.reply(resultMessage);
                 });
             }
