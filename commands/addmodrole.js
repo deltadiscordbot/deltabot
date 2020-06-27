@@ -13,7 +13,7 @@ module.exports = {
   needsadmin: true,
   args: true,
   guildOnly: true,
-  async execute(message, args, db) {
+  async execute(message, args, dbInstance) {
     modRoleAdding = args[0];
     const items = await dbInstance.collection('config').findOne({});
     currentModRoles = items.modroles;
