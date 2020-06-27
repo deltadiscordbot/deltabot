@@ -1,5 +1,3 @@
-const { currentdb } = require('../config.json');
-var dbInstance;
 var setToChannel;
 var currentAnnounceChannels;
 module.exports = {

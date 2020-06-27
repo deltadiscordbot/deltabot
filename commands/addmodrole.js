@@ -1,4 +1,3 @@
-const {  currentdb } = require('../config.json');
 const package = require('../package.json');
 var dbInstance;
 var currentModRoles;

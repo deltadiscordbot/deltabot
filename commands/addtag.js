@@ -1,6 +1,3 @@
-const { currentdb } = require('../config.json');
-const package = require('../package.json');
-const Discord = require('discord.js');
 module.exports = {
     name: 'addtag',
     description: 'Add a help tag. (Helper only)',
