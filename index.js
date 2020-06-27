@@ -346,14 +346,15 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
+const deltaDiscordID = "625714187078860810", altstoreDiscordID = "625766896230334465";
 let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
 client.once('ready', async () => {
     updateVars();
     updateVersions();
     setInterval(updateVersions, 60000);
     console.log('Ready!');
-    deltaDiscord = client.guilds.cache.get("625714187078860810")
-    altstoreDiscord = client.guilds.cache.get("625766896230334465");
+    deltaDiscord = client.guilds.cache.get(deltaDiscordID)
+    altstoreDiscord = client.guilds.cache.get(altstoreDiscordID);
     initReactionRoles();
 });
 
@@ -452,7 +453,30 @@ function createRR(message, array) {
 //This event listener handles all messages and gives credits to users
 client.on('message', message => {
     if (message.author.bot) return; //Bots don't deserve credits.
+    if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
+        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db2) {
+            if (err) throw err;
+            dbInstance = db2.db(currentdb);
+            const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
+            if (messageLog != null) {
+                const newCount = messageLog.messageCount + 1;
+                const myobj = { channelid: message.channel.id };
+                const newvalues = { $set: { messageCount: newCount, lastmessage: Date.now() } };
+                dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
+                    if (err) throw err;
+                });
+                db2.close();
 
+            } else {
+                var myobj = { channelid: message.channel.id, channelname: message.channel.name, guildID: message.guild.id, guildname: message.guild.name, messageCount: 1, lastmessage: Date.now() };
+                dbInstance.collection("logs").insertOne(myobj, function (err, res) {
+                    if (err) throw err;
+                });
+                db2.close();
+
+            }
+        });
+    }
     if (!cooldowns.has("lastMessage")) {
         cooldowns.set("lastMessage", new Discord.Collection());
     }
