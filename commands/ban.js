@@ -9,7 +9,6 @@ module.exports = {
   execute(message, args) {
     // Ignore messages that aren't from a guild
     if (!message.guild) return;
-
     // Assuming we mention someone in the message, this will return the user
     // Read more about mentions over at https://discord.js.org/#/docs/main/stable/class/MessageMentions
     var user = message.mentions.users.first();

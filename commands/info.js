@@ -6,8 +6,8 @@ module.exports = {
     guildOnly: true,
     aliases: ['stats'],
     cooldown: 30,
-    needsclient: true,
-    execute(message, args, client) {
+    execute(message, args) {
+        const client = message.client;
         const infoEmbed = new Discord.MessageEmbed()
             .setColor('#8A28F7')
             .setTitle(package.name)

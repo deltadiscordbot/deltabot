@@ -1,5 +1,3 @@
-const { mongodbase, currentdb } = require('../config.json');
-var MongoClient = require('mongodb').MongoClient;
 const Discord = require('discord.js');
 module.exports = {
   name: 'whois',
@@ -7,9 +5,10 @@ module.exports = {
   cooldown: 10,
   updatedb: true,
   guildOnly: true,
-  needsclient: true,
+  needsdb: true,
   aliases: ['lookup'],
-  execute(message, args, client) {
+  async execute(message, args, dbInstance) {
+    const client = message.client;
     let userObject;
     if (args.length) {
       if (message.mentions.users.size) {
@@ -35,26 +34,21 @@ module.exports = {
     sortedmembers.sort((a, b) => a.joinedAt - b.joinedAt)
     const userJoinPosition = sortedmembers.indexOf(memberObject) + 1
     let fields = [{ name: "User created:", value: userCreated, inline: true }, { name: "Joined server:", value: userJoinedServer, inline: true }, { name: "Join position:", value: userJoinPosition, inline: true }, { name: "User roles:", value: userRoles, inline: true }]
-    MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
-      if (err) throw err;
-      dbInstance = db.db(currentdb);
-      let color = "#8A28F7";
-      user = await dbInstance.collection("users").findOne({ id: userObject.id })
-      if (user != null) {
-        coloe = user.color;
-        if (user.specialack) {
-          fields.push({ name: "Special Acknowledgements", value: user.specialack })
-        }
+    let color = "#8A28F7";
+    user = await dbInstance.collection("users").findOne({ id: userObject.id })
+    if (user != null) {
+      coloe = user.color;
+      if (user.specialack) {
+        fields.push({ name: "Special Acknowledgements", value: user.specialack })
       }
-      const modEmbed = new Discord.MessageEmbed()
-        .setColor(color)
-        .setAuthor(username)
-        .setThumbnail(userAvatar)
-        .addFields(fields)
-        .setTimestamp()
-        .setFooter(`ID: ${userID}`);
-      message.channel.send(modEmbed)
-        .then(msg => { db.close() });
-    });
+    }
+    const modEmbed = new Discord.MessageEmbed()
+      .setColor(color)
+      .setAuthor(username)
+      .setThumbnail(userAvatar)
+      .addFields(fields)
+      .setTimestamp()
+      .setFooter(`ID: ${userID}`);
+    message.channel.send(modEmbed)
   },
-};
+}

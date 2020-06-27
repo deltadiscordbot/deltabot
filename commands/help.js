@@ -1,6 +1,3 @@
-var MongoClient = require('mongodb').MongoClient;
-const { mongodbase, currentdb } = require('../config.json');
-var dbInstance;
 const package = require('../package.json');
 var prefix = "!";
 const Discord = require('discord.js');
@@ -10,14 +7,10 @@ module.exports = {
     aliases: ['commands'],
     usage: '[command name]',
     cooldown: 5,
-    execute(message, args) {
-        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
-            if (err) throw err;
-            dbInstance = db.db(currentdb);
-            const items = await dbInstance.collection('config').findOne({});
-            prefix = await items.prefix;
-            db.close();
-        });
+    needsdb: true,
+    async execute(message, args, dbInstance) {
+        const items = await dbInstance.collection('config').findOne({});
+        prefix = await items.prefix;
         const { commands } = message.client;
         let currentString = '';
         let modString = '';

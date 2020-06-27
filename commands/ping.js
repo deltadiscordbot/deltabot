@@ -4,11 +4,10 @@ module.exports = {
     name: 'ping',
     description: 'pong!',
     cooldown: 5,
-    needsclient: true,
-    async execute(message, args, client) {
+    async execute(message, args) {
 
         //message.channel.send('Pong! in `' + `${Date.now() - message.createdTimestamp}` + 'ms`');
         const m = await message.channel.send("Ping?");
-        m.edit(`Pong! Latency is \`${m.createdTimestamp - message.createdTimestamp}ms\`. API Latency is \`${client.ws.ping}ms\``);
+        m.edit(`Pong! Latency is \`${m.createdTimestamp - message.createdTimestamp}ms\`. API Latency is \`${message.client.ws.ping}ms\``);
     },
 };

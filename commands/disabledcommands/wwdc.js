@@ -1,6 +1,3 @@
-const Discord = require('discord.js');
-var MongoClient = require('mongodb').MongoClient;
-const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
     name: 'wwdc',
     description: 'Countdown to WWDC 2020',

@@ -5,9 +5,8 @@ module.exports = {
     description: `Uptime of ${package.name}.`,
     cooldown: 10,
     aliases: ['up'],
-    needsclient: true,
-    execute(message, args, client) {
-        let totalSeconds = (client.uptime / 1000);
+    execute(message, args) {
+        let totalSeconds = (message.client.uptime / 1000);
         let days = Math.floor(totalSeconds / 86400);
         totalSeconds %= 86400;
         let hours = Math.floor(totalSeconds / 3600);

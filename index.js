@@ -19,17 +19,17 @@ const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
 let databaseClient, altstoreApps, dbInstance, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
-const twitterClient = new Twitter({
-    consumer_key: twitterAPIKey,
-    consumer_secret: twitterAPISecret,
-    access_token_key: twitterAccessToken,
-    access_token_secret: twitterAccessSecret,
-});
-const twitterParameters = {
-    follow: "1137807296778498048",
-    tweet_mode: "extended"
-};
 
+// const twitterClient = new Twitter({
+//     consumer_key: twitterAPIKey,
+//     consumer_secret: twitterAPISecret,
+//     access_token_key: twitterAccessToken,
+//     access_token_secret: twitterAccessSecret,
+// });
+// const twitterParameters = {
+//     follow: "1137807296778498048",
+//     tweet_mode: "extended"
+// };
 
 function updateVersions() {
     fetch(mainSourceURL, settings)
@@ -73,7 +73,6 @@ function updateVersions() {
             newClipBetaVersion = newClipBetaData['version'];
             newClipVersion = newClipData['version'];
 
-            dbInstance = databaseClient.db(currentdb);
 
             //AltStore
             if (newAltstoreVersion != oldAltstoreVersion) {
@@ -231,7 +230,6 @@ function updateVersions() {
             newAltstoreVersion = newAltstoreData['version'];
             newDeltaVersion = newDeltaData['version'];
 
-            dbInstance = databaseClient.db(currentdb);
             //AltStore Alpha
             if (newAltstoreVersion != oldAltstoreAlphaVersion) {
                 appsList[4] = newAltstoreVersion;
@@ -285,10 +283,9 @@ function updateVersions() {
         });
 };
 async function updateVars() {
-    dbInstance = databaseClient.db(currentdb);
     const dataItems = await dbInstance.collection('data').findOne({});
     appsList = dataItems.apps;
-    //     appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
+    // appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
     oldAltstoreVersion = appsList[0];
     oldDeltaVersion = appsList[1];
     oldAltstoreBetaVersion = appsList[2];
@@ -309,20 +306,20 @@ async function updateVars() {
         index++;
     });
     index = 0;
-    items.twitterchannel.forEach(element => {
-        twitterchannels[index] = client.channels.cache.get(element);
-        index++;
-    });
-    index = 0;
     items.betaannouncechannel.forEach(element => {
         betaannounceChannels[index] = client.channels.cache.get(element);
         index++;
     });
+    // index = 0;
+    // items.twitterchannel.forEach(element => {
+    //     twitterchannels[index] = client.channels.cache.get(element);
+    //     index++;
+    // });
 }
 
 function exeCommand(command, message, args) {
-    if (command.needsclient) {
-        command.execute(message, args, client);
+    if (command.needsdb) {
+        command.execute(message, args, dbInstance)
     } else {
         command.execute(message, args);
     }
@@ -340,10 +337,13 @@ for (const file of commandFiles) {
 }
 const deltaDiscordID = "625714187078860810", altstoreDiscordID = "625766896230334465";
 let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
+
+
 client.once('ready', async () => {
     databaseClient = await MongoClient.connect(mongodbase, {
         useUnifiedTopology: true,
     });
+    dbInstance = databaseClient.db(currentdb)
     updateVars();
     updateVersions();
     setInterval(updateVersions, 60000);
@@ -449,7 +449,6 @@ function createRR(message, array) {
 client.on('message', async message => {
     if (message.author.bot) return; //Bots don't deserve credits.
     if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
-        dbInstance = databaseClient.db(currentdb);
         const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
         if (messageLog != null) {
             const newCount = messageLog.messageCount + 1;
@@ -484,7 +483,6 @@ client.on('message', async message => {
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
     try {
-        dbInstance = databaseClient.db(currentdb);
         const user = await dbInstance.collection("users").findOne({ id: message.author.id });
         if (user == null) {
             return;

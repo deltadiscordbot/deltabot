@@ -10,9 +10,8 @@ module.exports = {
     usage: "(SourceURL)",
     cooldown: 30,
     args: true,
-    needsclient: true,
     guildOnly: true,
-    async execute(message, args, client) {
+    async execute(message, args) {
         sourceApps = [];
         if (args.length == 1) {
             fetch(args[0], settings)

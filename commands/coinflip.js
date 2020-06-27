@@ -1,22 +1,17 @@
 const Discord = require('discord.js');
-var MongoClient = require('mongodb').MongoClient;
-const { mongodbase, currentdb } = require('../config.json');
 module.exports = {
     name: 'coinflip',
     description: 'Flip a coin! Default Bet is 100',
     category: "eco",
     guildOnly: true,
     args: true,
-    aliases: ['coin', 'flipcoin', 'coins', 'flipcoins'],
-    async execute(message, args) {
-        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
-            if (err) throw err;
-            dbInstance = db.db(currentdb);
+    needsdb: true,    aliases: ['coin', 'flipcoin', 'coins', 'flipcoins'],
+    async execute(message, args,dbInstance) {
             const user = await dbInstance.collection("users").findOne({ id: message.author.id });
             //Check if user has an account
             if (user == null) {
                 message.reply(`you do not have an account. Do \`!daily\` to make one.`)
-                return db.close();
+                return;
             }
             //Set defualt bet to 100
             let bet = 100;
@@ -75,7 +70,5 @@ module.exports = {
                     message.reply(resultMessage);
                 });
             }
-            db.close();
-        });
     }
 };
