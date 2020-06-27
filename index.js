@@ -17,7 +17,7 @@ let twitterchannels = [];
 const betaRole = "<@&716483174028410962>";
 const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
-let altstoreApps, dbInstance, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
+let databaseClient, altstoreApps, dbInstance, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 const twitterClient = new Twitter({
     consumer_key: twitterAPIKey,
@@ -29,6 +29,8 @@ const twitterParameters = {
     follow: "1137807296778498048",
     tweet_mode: "extended"
 };
+
+
 function updateVersions() {
     fetch(mainSourceURL, settings)
         .then(res => res.json())
@@ -71,147 +73,144 @@ function updateVersions() {
             newClipBetaVersion = newClipBetaData['version'];
             newClipVersion = newClipData['version'];
 
-            MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {
-                if (err) throw err;
-                dbInstance = db.db(currentdb);
+            dbInstance = databaseClient.db(currentdb);
 
-                //AltStore
-                if (newAltstoreVersion != oldAltstoreVersion) {
-                    appsList[0] = newAltstoreVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#018084')
-                            .setThumbnail(newAltstoreData['iconURL'])
-                            .setTitle("New AltStore update!")
-                            .addField("Version:", `${oldAltstoreVersion} -> ${newAltstoreVersion}`, true)
-                            .addField("What's new:", newAltstoreData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        announceChannels.forEach(element => {
-                            element.send(modEmbed);
-                        });
-                    })
-                }
-                //AltStore Beta
-                if (newAltstoreBetaVersion != oldAltstoreBetaVersion) {
-                    appsList[2] = newAltstoreBetaVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#018084')
-                            .setThumbnail(newAltstoreBetaData['iconURL'])
-                            .setTitle("New AltStore Beta update!")
-                            .addField("Version:", `${oldAltstoreBetaVersion} -> ${newAltstoreBetaVersion}`, true)
-                            .addField("What's new:", newAltstoreBetaData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        betaannounceChannels.forEach(element => {
-                            element.send(betaRole)
-                                .then(msg => {
-                                    msg.edit(modEmbed);
-                                })
-                        });
-                    })
-                }
-                //Delta
-                if (newDeltaVersion != oldDeltaVersion) {
-                    appsList[1] = newDeltaVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#8A28F7')
-                            .setThumbnail(newDeltaData['iconURL'])
-                            .setTitle("New Delta update!")
-                            .addField("Version:", `${oldDeltaVersion} -> ${newDeltaVersion}`, true)
-                            .addField("What's new:", newDeltaData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        announceChannels.forEach(element => {
-                            element.send(modEmbed);
-                        });
+            //AltStore
+            if (newAltstoreVersion != oldAltstoreVersion) {
+                appsList[0] = newAltstoreVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreData['iconURL'])
+                        .setTitle("New AltStore update!")
+                        .addField("Version:", `${oldAltstoreVersion} -> ${newAltstoreVersion}`, true)
+                        .addField("What's new:", newAltstoreData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    announceChannels.forEach(element => {
+                        element.send(modEmbed);
+                    });
+                })
+            }
+            //AltStore Beta
+            if (newAltstoreBetaVersion != oldAltstoreBetaVersion) {
+                appsList[2] = newAltstoreBetaVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreBetaData['iconURL'])
+                        .setTitle("New AltStore Beta update!")
+                        .addField("Version:", `${oldAltstoreBetaVersion} -> ${newAltstoreBetaVersion}`, true)
+                        .addField("What's new:", newAltstoreBetaData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    betaannounceChannels.forEach(element => {
+                        element.send(betaRole)
+                            .then(msg => {
+                                msg.edit(modEmbed);
+                            })
+                    });
+                })
+            }
+            //Delta
+            if (newDeltaVersion != oldDeltaVersion) {
+                appsList[1] = newDeltaVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#8A28F7')
+                        .setThumbnail(newDeltaData['iconURL'])
+                        .setTitle("New Delta update!")
+                        .addField("Version:", `${oldDeltaVersion} -> ${newDeltaVersion}`, true)
+                        .addField("What's new:", newDeltaData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    announceChannels.forEach(element => {
+                        element.send(modEmbed);
+                    });
 
+                });
+            }
+            //Delta Beta
+            if (newDeltaBetaVersion != oldDeltaBetaVersion) {
+                appsList[3] = newDeltaBetaVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#8A28F7')
+                        .setThumbnail(newDeltaBetaData['iconURL'])
+                        .setTitle("New Delta Beta update!")
+                        .addField("Version:", `${oldDeltaBetaVersion} -> ${newDeltaBetaVersion}`, true)
+                        .addField("What's new:", newDeltaBetaData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    betaannounceChannels.forEach(element => {
+                        element.send(betaRole)
+                            .then(msg => {
+                                msg.edit(modEmbed);
+                            })
                     });
-                }
-                //Delta Beta
-                if (newDeltaBetaVersion != oldDeltaBetaVersion) {
-                    appsList[3] = newDeltaBetaVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#8A28F7')
-                            .setThumbnail(newDeltaBetaData['iconURL'])
-                            .setTitle("New Delta Beta update!")
-                            .addField("Version:", `${oldDeltaBetaVersion} -> ${newDeltaBetaVersion}`, true)
-                            .addField("What's new:", newDeltaBetaData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        betaannounceChannels.forEach(element => {
-                            element.send(betaRole)
-                                .then(msg => {
-                                    msg.edit(modEmbed);
-                                })
-                        });
+                });
+            }
+            //clip Beta
+            if (newClipBetaVersion != oldClipBetaVersion) {
+                appsList[6] = newClipBetaVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#EC008C')
+                        .setThumbnail(newClipBetaData['iconURL'])
+                        .setTitle("New Clip Beta update!")
+                        .addField("Version:", `${oldClipBetaVersion} -> ${newClipBetaVersion}`, true)
+                        .addField("What's new:", newClipBetaData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    betaannounceChannels.forEach(element => {
+                        element.send(betaRole)
+                            .then(msg => {
+                                msg.edit(modEmbed);
+                            })
                     });
-                }
-                //clip Beta
-                if (newClipBetaVersion != oldClipBetaVersion) {
-                    appsList[6] = newClipBetaVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#EC008C')
-                            .setThumbnail(newClipBetaData['iconURL'])
-                            .setTitle("New Clip Beta update!")
-                            .addField("Version:", `${oldClipBetaVersion} -> ${newClipBetaVersion}`, true)
-                            .addField("What's new:", newClipBetaData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        betaannounceChannels.forEach(element => {
-                            element.send(betaRole)
-                                .then(msg => {
-                                    msg.edit(modEmbed);
-                                })
-                        });
+                });
+            }
+            //clip 
+            if (newClipVersion != oldClipVersion) {
+                appsList[7] = newClipVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#EC008C')
+                        .setThumbnail(newClipData['iconURL'])
+                        .setTitle("New Clip update!")
+                        .addField("Version:", `${oldClipVersion} -> ${newClipVersion}`, true)
+                        .addField("What's new:", newClipData['versionDescription'].substring(0, 1024))
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    announceChannels.forEach(element => {
+                        element.send(modEmbed);
                     });
-                }
-                //clip 
-                if (newClipVersion != oldClipVersion) {
-                    appsList[7] = newClipVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#EC008C')
-                            .setThumbnail(newClipData['iconURL'])
-                            .setTitle("New Clip update!")
-                            .addField("Version:", `${oldClipVersion} -> ${newClipVersion}`, true)
-                            .addField("What's new:", newClipData['versionDescription'].substring(0, 1024))
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        announceChannels.forEach(element => {
-                            element.send(modEmbed);
-                        });
-                    });
-                }
-            });
+                });
+            }
         });
 
     fetch(alphaSourceURL, settings)
@@ -232,99 +231,92 @@ function updateVersions() {
             newAltstoreVersion = newAltstoreData['version'];
             newDeltaVersion = newDeltaData['version'];
 
-            MongoClient.connect(mongodbase, { useUnifiedTopology: true }, function (err, db) {
-                if (err) throw err;
-                dbInstance = db.db(currentdb);
-                //AltStore Alpha
-                if (newAltstoreVersion != oldAltstoreAlphaVersion) {
-                    appsList[4] = newAltstoreVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#018084')
-                            .setThumbnail(newAltstoreData['iconURL'])
-                            .setTitle("New AltStore Alpha update!")
-                            .addField("Version:", `${oldAltstoreAlphaVersion} -> ${newAltstoreVersion}`, true)
-                            .addField("What's new:", newAltstoreData['versionDescription'].substring(0, 1024))
-                            .addField("Add source:", alphaSourceURL)
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        betaannounceChannels.forEach(element => {
-                            element.send(alphaRole)
-                                .then(msg => {
-                                    msg.edit(modEmbed);
-                                })
-                        });
-                    })
-                }
-                //Delta Alpha
-                if (newDeltaVersion != oldDeltaAlphaVersion) {
-                    appsList[5] = newDeltaVersion;
-                    var myquery = { name: "versions" };
-                    var newvalue = { $set: { apps: appsList } };
-                    dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
-                        if (err) throw err;
-                        updateVars();
-                        const modEmbed = new Discord.MessageEmbed()
-                            .setColor('#8A28F7')
-                            .setThumbnail(newDeltaData['iconURL'])
-                            .setTitle("New Delta Alpha update!")
-                            .addField("Version:", `${oldDeltaAlphaVersion} -> ${newDeltaVersion}`, true)
-                            .addField("What's new:", newDeltaData['versionDescription'].substring(0, 1024))
-                            .addField("Add source:", alphaSourceURL)
-                            .setTimestamp()
-                            .setFooter(package.name + ' v. ' + package.version);
-                        betaannounceChannels.forEach(element => {
-                            element.send(alphaRole)
-                                .then(msg => {
-                                    msg.edit(modEmbed);
-                                })
-                        });
+            dbInstance = databaseClient.db(currentdb);
+            //AltStore Alpha
+            if (newAltstoreVersion != oldAltstoreAlphaVersion) {
+                appsList[4] = newAltstoreVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#018084')
+                        .setThumbnail(newAltstoreData['iconURL'])
+                        .setTitle("New AltStore Alpha update!")
+                        .addField("Version:", `${oldAltstoreAlphaVersion} -> ${newAltstoreVersion}`, true)
+                        .addField("What's new:", newAltstoreData['versionDescription'].substring(0, 1024))
+                        .addField("Add source:", alphaSourceURL)
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    betaannounceChannels.forEach(element => {
+                        element.send(alphaRole)
+                            .then(msg => {
+                                msg.edit(modEmbed);
+                            })
                     });
-                }
-            });
-
+                })
+            }
+            //Delta Alpha
+            if (newDeltaVersion != oldDeltaAlphaVersion) {
+                appsList[5] = newDeltaVersion;
+                var myquery = { name: "versions" };
+                var newvalue = { $set: { apps: appsList } };
+                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                    if (err) throw err;
+                    updateVars();
+                    const modEmbed = new Discord.MessageEmbed()
+                        .setColor('#8A28F7')
+                        .setThumbnail(newDeltaData['iconURL'])
+                        .setTitle("New Delta Alpha update!")
+                        .addField("Version:", `${oldDeltaAlphaVersion} -> ${newDeltaVersion}`, true)
+                        .addField("What's new:", newDeltaData['versionDescription'].substring(0, 1024))
+                        .addField("Add source:", alphaSourceURL)
+                        .setTimestamp()
+                        .setFooter(package.name + ' v. ' + package.version);
+                    betaannounceChannels.forEach(element => {
+                        element.send(alphaRole)
+                            .then(msg => {
+                                msg.edit(modEmbed);
+                            })
+                    });
+                });
+            }
         });
 };
-function updateVars() {
-    MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
-        if (err) throw err;
-        dbInstance = db.db(currentdb);
-        const dataItems = await dbInstance.collection('data').findOne({});
-        appsList = dataItems.apps;
-        //     appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
-        oldAltstoreVersion = appsList[0];
-        oldDeltaVersion = appsList[1];
-        oldAltstoreBetaVersion = appsList[2];
-        oldDeltaBetaVersion = appsList[3];
-        oldAltstoreAlphaVersion = appsList[4];
-        oldDeltaAlphaVersion = appsList[5];
-        oldClipBetaVersion = appsList[6];
-        oldClipVersion = appsList[7];
-        const items = await dbInstance.collection('config').findOne({});
-        prefix = items.prefix;
-        welcomechannelID = items.welcomechannel;
-        modRoles = items.modroles;
-        helperRoles = items.helperroles;
-        logChannelID = items.logchannel;
-        var index = 0;
-        items.announcechannel.forEach(element => {
-            announceChannels[index] = client.channels.cache.get(element);
-            index++;
-        });
-        index = 0;
-        items.twitterchannel.forEach(element => {
-            twitterchannels[index] = client.channels.cache.get(element);
-            index++;
-        });
-        index = 0;
-        items.betaannouncechannel.forEach(element => {
-            betaannounceChannels[index] = client.channels.cache.get(element);
-            index++;
-        });
+async function updateVars() {
+    dbInstance = databaseClient.db(currentdb);
+    const dataItems = await dbInstance.collection('data').findOne({});
+    appsList = dataItems.apps;
+    //     appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
+    oldAltstoreVersion = appsList[0];
+    oldDeltaVersion = appsList[1];
+    oldAltstoreBetaVersion = appsList[2];
+    oldDeltaBetaVersion = appsList[3];
+    oldAltstoreAlphaVersion = appsList[4];
+    oldDeltaAlphaVersion = appsList[5];
+    oldClipBetaVersion = appsList[6];
+    oldClipVersion = appsList[7];
+    const items = await dbInstance.collection('config').findOne({});
+    prefix = items.prefix;
+    welcomechannelID = items.welcomechannel;
+    modRoles = items.modroles;
+    helperRoles = items.helperroles;
+    logChannelID = items.logchannel;
+    var index = 0;
+    items.announcechannel.forEach(element => {
+        announceChannels[index] = client.channels.cache.get(element);
+        index++;
+    });
+    index = 0;
+    items.twitterchannel.forEach(element => {
+        twitterchannels[index] = client.channels.cache.get(element);
+        index++;
+    });
+    index = 0;
+    items.betaannouncechannel.forEach(element => {
+        betaannounceChannels[index] = client.channels.cache.get(element);
+        index++;
     });
 }
 
@@ -349,6 +341,9 @@ for (const file of commandFiles) {
 const deltaDiscordID = "625714187078860810", altstoreDiscordID = "625766896230334465";
 let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
 client.once('ready', async () => {
+    databaseClient = await MongoClient.connect(mongodbase, {
+        useUnifiedTopology: true,
+    });
     updateVars();
     updateVersions();
     setInterval(updateVersions, 60000);
@@ -451,31 +446,24 @@ function createRR(message, array) {
  */
 
 //This event listener handles all messages and gives credits to users
-client.on('message', message => {
+client.on('message', async message => {
     if (message.author.bot) return; //Bots don't deserve credits.
     if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
-        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db2) {
-            if (err) throw err;
-            dbInstance = db2.db(currentdb);
-            const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
-            if (messageLog != null) {
-                const newCount = messageLog.messageCount + 1;
-                const myobj = { channelid: message.channel.id };
-                const newvalues = { $set: { messageCount: newCount, lastmessage: Date.now() } };
-                dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
-                    if (err) throw err;
-                });
-                db2.close();
-
-            } else {
-                var myobj = { channelid: message.channel.id, channelname: message.channel.name, guildID: message.guild.id, guildname: message.guild.name, messageCount: 1, lastmessage: Date.now() };
-                dbInstance.collection("logs").insertOne(myobj, function (err, res) {
-                    if (err) throw err;
-                });
-                db2.close();
-
-            }
-        });
+        dbInstance = databaseClient.db(currentdb);
+        const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
+        if (messageLog != null) {
+            const newCount = messageLog.messageCount + 1;
+            const myobj = { channelid: message.channel.id };
+            const newvalues = { $set: { messageCount: newCount, lastmessage: Date.now() } };
+            dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
+                if (err) throw err;
+            });
+        } else {
+            var myobj = { channelid: message.channel.id, channelname: message.channel.name, guildID: message.guild.id, guildname: message.guild.name, messageCount: 1, lastmessage: Date.now() };
+            dbInstance.collection("logs").insertOne(myobj, function (err, res) {
+                if (err) throw err;
+            });
+        }
     }
     if (!cooldowns.has("lastMessage")) {
         cooldowns.set("lastMessage", new Discord.Collection());
@@ -496,29 +484,25 @@ client.on('message', message => {
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
     try {
-        MongoClient.connect(mongodbase, { useUnifiedTopology: true }, async function (err, db) {
-            if (err) throw err;
-            dbInstance = db.db(currentdb);
-            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
-            if (user == null) {
-                return;
-            } else {
-                const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
-                const newbalance = user.balance + randCredits;
-                const newTotal = user.totalCredits + randCredits;
-                let talkCredits = 0;
-                if (user.talkCredits != undefined) {
-                    talkCredits = user.talkCredits + randCredits;
-                }
-                const myobj = { id: message.author.id };
-                const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
-                dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
-                    if (err) throw err;
-                    return;
-                });
+        dbInstance = databaseClient.db(currentdb);
+        const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+        if (user == null) {
+            return;
+        } else {
+            const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
+            const newbalance = user.balance + randCredits;
+            const newTotal = user.totalCredits + randCredits;
+            let talkCredits = 0;
+            if (user.talkCredits != undefined) {
+                talkCredits = user.talkCredits + randCredits;
             }
-            db.close();
-        });
+            const myobj = { id: message.author.id };
+            const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
+            dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+                if (err) throw err;
+                return;
+            });
+        }
     } catch (error) {
         console.error(error);
         message.reply('There was an error while trying to manage xp!');
@@ -649,7 +633,7 @@ client.on('message', message => {
 });
 
 //Join message
-client.on('guildMemberAdd', member => {
+client.on('guildMemberAdd', async member => {
     // AltStore Discord
     if (member.guild.id == "625766896230334465") {
         let deltaMember, role;
