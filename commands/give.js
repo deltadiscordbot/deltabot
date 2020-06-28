@@ -21,7 +21,7 @@ module.exports = {
 							message.reply("that user does not have an account.");
 							return;
 						}
-						if (owner.balance > parseInt(args[1])) {
+						if (owner.balance >= parseInt(args[1])) {
 							const balance = user.balance + parseInt(args[1]);
 							const ownerBalance = owner.balance - parseInt(args[1]);
 							const newvalues = { $set: { balance: balance } };
