@@ -13,7 +13,7 @@ module.exports = {
             message.reply(`you do not have an account. Do \`!daily\` to make one.`)
             return;
         }
-        //Set defualt bet to 100
+        //Set default bet to 100
         let bet = 100;
         //Check if user made a custom bet, and if the bet is a positive number
         if (args[1]) {

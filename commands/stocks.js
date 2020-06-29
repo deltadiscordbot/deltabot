@@ -16,12 +16,12 @@ module.exports = {
         api_key.apiKey = stocksAPIKey
         const api = new finnhub.DefaultApi()
         if (args.length) {
+            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
             const command = args.shift();
             switch (command.toString().toLowerCase()) {
                 case "buy":
                 case "b":
                 case "purchase":
-                    const user = await dbInstance.collection("users").findOne({ id: message.author.id });
                     if (user != null) {
                         const symbol = args[0].toString().toUpperCase();
                         api.quote(symbol, (error, data, response) => {

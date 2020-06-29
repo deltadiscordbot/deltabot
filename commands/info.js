@@ -12,7 +12,7 @@ module.exports = {
             .setColor('#8A28F7')
             .setTitle(package.name)
             .setURL("https://github.com/deltadiscordbot/deltabot")
-            .setThumbnail(client.user.avatarURL)
+            .setThumbnail(client.user.avatarURL())
             .setDescription(package.description)
             .addField('Servers:', client.guilds.cache.size, true)
             .addField('Users:', client.users.cache.size, true)

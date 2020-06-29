@@ -464,6 +464,7 @@ client.on('message', async message => {
             });
         }
     }
+
     if (!cooldowns.has("lastMessage")) {
         cooldowns.set("lastMessage", new Discord.Collection());
     }
@@ -474,37 +475,37 @@ client.on('message', async message => {
 
     if (timestamps.has(message.author.id)) {
         const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
         if (now < expirationTime) {
             return;
         }
     }
     timestamps.set(message.author.id, now);
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-    try {
-        const user = await dbInstance.collection("users").findOne({ id: message.author.id });
-        if (user == null) {
-            return;
-        } else {
-            const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
-            const newbalance = user.balance + randCredits;
-            const newTotal = user.totalCredits + randCredits;
-            let talkCredits = 0;
-            if (user.talkCredits != undefined) {
-                talkCredits = user.talkCredits + randCredits;
-            }
-            const myobj = { id: message.author.id };
-            const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
-            dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
-                if (err) throw err;
+    setTimeout(async () => {
+        try {
+            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+            if (user == null) {
                 return;
-            });
+            } else {
+                const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
+                const newbalance = user.balance + randCredits;
+                const newTotal = user.totalCredits + randCredits;
+                let talkCredits = 0;
+                if (user.talkCredits != undefined) {
+                    talkCredits = user.talkCredits + randCredits;
+                }
+                const myobj = { id: message.author.id };
+                const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
+                dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+                    if (err) throw err;
+                    return;
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            message.reply('There was an error while trying to manage xp!');
         }
-    } catch (error) {
-        console.error(error);
-        message.reply('There was an error while trying to manage xp!');
-    }
+    }, 1000);
 })
 
 
@@ -523,31 +524,31 @@ client.on('message', message => {
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
     if (!command) return;
-
-    if (!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
-    }
-
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000;
-
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
-                .then(msg => {
-                    setTimeout(function () {
-                        msg.delete();
-                    }, 5000);
-                });
+    if (message.author.id != ownerID) {
+        if (!cooldowns.has(command.name)) {
+            cooldowns.set(command.name, new Discord.Collection());
         }
-    }
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
+        const now = Date.now();
+        const timestamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 3) * 1000;
+
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+            if (now < expirationTime) {
+                const timeLeft = (expirationTime - now) / 1000;
+                return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+                    .then(msg => {
+                        setTimeout(function () {
+                            msg.delete();
+                        }, 5000);
+                    });
+            }
+        }
+        timestamps.set(message.author.id, now);
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+    }
     try {
         if (command.guildOnly && message.channel.type !== 'text') {
             return message.reply('I can\'t execute that command inside DMs!');
