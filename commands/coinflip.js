@@ -5,7 +5,7 @@ module.exports = {
     category: "eco",
     guildOnly: true,
     args: true,
-    needsdb: true, aliases: ['coin', 'flipcoin', 'coins', 'flipcoins'],
+    needsdb: true, aliases: ['coin', 'flipcoin', 'coins', 'flipcoins', 'flipacoin'],
     async execute(message, args, dbInstance) {
         const user = await dbInstance.collection("users").findOne({ id: message.author.id });
         //Check if user has an account
