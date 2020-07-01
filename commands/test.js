@@ -5,7 +5,8 @@ module.exports = {
     needsowner: true,
     cooldown: 1,
     category: "owner",
-    async execute(message, args) {
-console.log(message.client)       
+    needsdb: true,
+    async execute(message, args, dbInstance) {
+
     },
 };
