@@ -17,6 +17,7 @@ module.exports = {
         let adminString = '';
         let funString = '';
         let ecoString = '';
+        let musicString = '';
         if (!args.length) {
             for (let elem of commands.entries()) {
                 switch (elem[1].category) {
@@ -33,6 +34,9 @@ module.exports = {
                     case "eco":
                         ecoString = ecoString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
                         break;
+                    case "music":
+                        musicString = musicString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
                     default:
                         currentString = currentString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
                         break;
@@ -45,6 +49,7 @@ module.exports = {
                 .setTitle("Here\'s a list of all my commands:")
                 .setDescription(currentString)
                 .addField("Fun commands:", funString)
+                .addField("Music commands:", musicString)
                 .addField("Economy commands:", ecoString)
                 .addField("Mod commands:", modString)
                 .addField("Admin commands:", adminString)
