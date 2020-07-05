@@ -74,8 +74,6 @@ module.exports = {
 						clearInterval(moveTimer);
 						m.delete();
 						turnCount++;
-						console.log(parseInt(m.content) - 1);
-						console.log(playSpots.indexOf(parseInt(m.content)))
 						makeMove(playSpots.splice(playSpots.indexOf(parseInt(m.content)), 1), msgCollector);
 					});
 					msgCollector.on("end", (e, r) => {
@@ -91,7 +89,6 @@ module.exports = {
 					});
 				}
 				function makeMove(move, msgCollector) {
-					console.log(playSpots)
 					msgCollector.stop()
 					if (whosTurn == player1) {
 						gameBoard[move - 1] = xPiece;

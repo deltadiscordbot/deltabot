@@ -1,19 +1,21 @@
 const fs = require('fs');
+const queue = new Map();
+let serverQueue;
 const Discord = require('discord.js');
 let { prefix } = require('./config.json');
-const { mainSourceURL, alphaSourceURL, ownerID, twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken, token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
+const { projectId, mainSourceURL, alphaSourceURL, ownerID, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
+const dialogflow = require('@google-cloud/dialogflow');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 require('log-timestamp')(function () { return new Date().toLocaleString() + ' "%s"' });
 const client = new Discord.Client();
-const Twitter = require('twitter-lite');
+//const Twitter = require('twitter-lite');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns = new Discord.Collection();
-let announceChannels = [];
-let betaannounceChannels = [];
-let twitterchannels = [];
+let announceChannels = [], betaannounceChannels = [], supportchannels = [];
+//let twitterchannels = [];
 const betaRole = "<@&716483174028410962>";
 const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
@@ -310,6 +312,11 @@ async function updateVars() {
         betaannounceChannels[index] = client.channels.cache.get(element);
         index++;
     });
+    index = 0;
+    items.supportchannels.forEach(element => {
+        supportchannels[index] = client.channels.cache.get(element);
+        index++;
+    });
     // index = 0;
     // items.twitterchannel.forEach(element => {
     //     twitterchannels[index] = client.channels.cache.get(element);
@@ -317,14 +324,18 @@ async function updateVars() {
     // });
 }
 
-function exeCommand(command, message, args) {
+async function exeCommand(command, message, args) {
     if (command.needsdb) {
-        command.execute(message, args, dbInstance)
+        await command.execute(message, args, dbInstance)
+    } else if (command.needsqueue) {
+        if (message.channel.name == "delta-bot" || message.channel.name == "music" || message.author.id == ownerID) {
+            await command.execute(message, args, queue);
+        }
     } else {
-        command.execute(message, args);
+        await command.execute(message, args);
     }
     if (command.updatedb) {
-        updateVars();
+        await updateVars();
     }
 }
 
@@ -445,9 +456,35 @@ function createRR(message, array) {
     .on("end", response => console.log("twitter stream ended"));
  */
 
+async function detectIntent(
+    projectId,
+    sessionId,
+    query,
+    languageCode
+) {
+    const sessionClient = new dialogflow.SessionsClient();
+    const sessionPath = sessionClient.projectAgentSessionPath(
+        projectId,
+        sessionId
+    );
+
+    const request = {
+        session: sessionPath,
+        queryInput: {
+            text: {
+                text: query,
+                languageCode: languageCode,
+            },
+        },
+    };
+
+    const responses = await sessionClient.detectIntent(request);
+    return responses[0];
+}
+
 //This event listener handles all messages and gives credits to users
 client.on('message', async message => {
-    if (message.author.bot) return; //Bots don't deserve credits.
+    if (message.author.bot || message.channel.type === 'dm') return; //Bots don't deserve credits.
     if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
         const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
         if (messageLog != null) {
@@ -569,7 +606,6 @@ client.on('message', message => {
 
                     }
                     if (isHelper) {
-                        console.log("mod")
                         return
                     };
                 });
@@ -578,12 +614,10 @@ client.on('message', message => {
                         isHelper = true;
                     }
                     if (isHelper) {
-                        console.log("helper")
                         return
                     };
                 })
                 if (!isHelper) {
-                    message.channel.send("You do not have permission to use this command.");
                     return;
                 } else {
                     exeCommand(command, message, args);
@@ -600,7 +634,6 @@ client.on('message', message => {
                     if (isMod) return;
                 });
                 if (!isMod) {
-                    message.channel.send("You need to be mod to use this command.");
                     return;
                 } else {
                     exeCommand(command, message, args);
@@ -610,14 +643,11 @@ client.on('message', message => {
                     exeCommand(command, message, args);
                     return;
                 } else {
-                    message.channel.send("You need to be admin to use this command.");
                 }
             } else if (command.needsowner) {
                 if (message.author.id == ownerID) {
                     exeCommand(command, message, args);
                     return;
-                } else {
-                    message.channel.send(":rage:");
                 }
             } else {
                 exeCommand(command, message, args);
@@ -630,6 +660,18 @@ client.on('message', message => {
         message.reply('there was an error trying to execute that command!');
     }
 });
+
+//AI helper
+client.on('message', async message => {
+    if (!supportchannels.includes(message.channel) || message.content.length < 20 || message.author.bot || message.content.startsWith(prefix)) return;
+    const sessionID = Math.floor(1000000 + Math.random() * 9000000).toString();
+    const result = await (await detectIntent(projectId, sessionID, message.content, "en-US")).queryResult;
+    console.log(result["intentDetectionConfidence"])
+    if (parseFloat(result["intentDetectionConfidence"]) > .70 && result["fulfillmentText"].length > 1) {
+        const items = await dbInstance.collection("tags").findOne({ name: result["fulfillmentText"].toString() });
+        if (items != null) message.channel.send(eval('`' + items.content + '`'));
+    }
+})
 
 //Join message
 client.on('guildMemberAdd', async member => {

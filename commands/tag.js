@@ -42,7 +42,7 @@ module.exports = {
                     message.channel.send(modEmbed);
                 }
             } else {
-                message.delete();
+                if (message.channel.name != "delta-bot") message.delete();
                 message.channel.send(eval('`' + items.content + '`'))
             }
             return;
