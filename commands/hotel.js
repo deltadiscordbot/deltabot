@@ -286,11 +286,11 @@ module.exports = {
                             const floorData = await dbInstance.collection("hotel").findOne({ floor: getFloor });
                             if (floorData != null) {
                                 const floorEmbed = new Discord.MessageEmbed()
-                                    .setTitle(floorData.floorName)
-                                    .setDescription(floorData.floorDescription)
+                                    .setTitle(floorData.floorName.toString().substring(0, 256))
+                                    .setDescription(floorData.floorDescription.toString().substring(0, 2048))
                                     .setThumbnail(floorData.floorIcon)
-                                    .addField("Floor:", floorData.floor, true)
-                                    .addField("Owned by:", floorData.ownerName, true)
+                                    .addField("Floor:", floorData.floor.toString().substring(0, 1024), true)
+                                    .addField("Owned by:", floorData.ownerName.toString().substring(0, 1024), true)
                                     .setTimestamp()
                                     .setFooter(`Requested by: ${message.author.tag}`)
                                 message.channel.send(floorEmbed)
