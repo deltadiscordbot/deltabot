@@ -1,4 +1,3 @@
-const ytdl = require('ytdl-core');
 module.exports = {
     name: 'pause',
     description: 'Pauses the music.',

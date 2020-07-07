@@ -1,4 +1,3 @@
-const ytdl = require('ytdl-core');
 const Discord = require('discord.js');
 module.exports = {
     name: 'queue',

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const queue = new Map();
-let serverQueue;
 const Discord = require('discord.js');
 let { prefix } = require('./config.json');
 const { projectId, mainSourceURL, alphaSourceURL, ownerID, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
@@ -328,7 +327,7 @@ async function exeCommand(command, message, args) {
     if (command.needsdb) {
         await command.execute(message, args, dbInstance)
     } else if (command.needsqueue) {
-        if (message.channel.name == "delta-bot" || message.channel.name == "music" || message.author.id == ownerID) {
+        if (message.channel.name == "delta-bot" || message.channel.name == "music" || message.author.id == ownerID || message.channel.name == "bot-commands") {
             await command.execute(message, args, queue);
         }
     } else {
@@ -663,7 +662,18 @@ client.on('message', message => {
 
 //AI helper
 client.on('message', async message => {
-    if (!supportchannels.includes(message.channel) || message.content.length < 20 || message.author.bot || message.content.startsWith(prefix)) return;
+    let isMod = false, isHelper = false;
+    modRoles.forEach(element => {
+        if (message.member.roles.cache.has(element) || message.member.hasPermission(['ADMINISTRATOR'])) {
+            isMod = true;
+        }
+    })
+    helperRoles.forEach(element => {
+        if (message.member.roles.cache.has(element)) {
+            isHelper = true;
+        }
+    })
+    if (!supportchannels.includes(message.channel) || message.content.length < 20 || message.author.bot || message.content.startsWith(prefix) || ((supportchannels.includes(message.channel) && message.channel.name != "delta-bot") && (isHelper || isMod))) return;
     const sessionID = Math.floor(1000000 + Math.random() * 9000000).toString();
     const result = await (await detectIntent(projectId, sessionID, message.content, "en-US")).queryResult;
     console.log(result["intentDetectionConfidence"])
@@ -715,7 +725,7 @@ client.on('guildMemberAdd', async member => {
     if (message.channel.type === 'dm') return;
     let logchannel = message.guild.channels.cache.get(logChannelID);
     if (!logchannel) return;
-
+ 
     const modEmbed = new Discord.MessageEmbed()
         .setColor('#ff0000')
         .setAuthor(message.author.tag, message.author.avatarURL())
@@ -725,14 +735,14 @@ client.on('guildMemberAdd', async member => {
         .setFooter(`Sender ID: ${message.author.id}`)
     logchannel.send(modEmbed);
 })
-
+ 
 //edited message
 client.on('messageUpdate', function (oldMessage, newMessage) {
     if (oldMessage.channel.type === 'dm') return;
     if (oldMessage.content.length && newMessage.content.length) {
         let logchannel = newMessage.guild.channels.cache.get(logChannelID);
         if (!logchannel) return;
-
+ 
         const modEmbed = new Discord.MessageEmbed()
             .setColor('#ffff00')
             .setAuthor(newMessage.author.tag, newMessage.author.avatarURL())
@@ -744,13 +754,13 @@ client.on('messageUpdate', function (oldMessage, newMessage) {
         logchannel.send(modEmbed);
     }
 })
-
+ 
 //banned member
 client.on('guildBanAdd', async function (guild, user) {
     let logchannel = guild.channels.cache.get(logChannelID);
     const banList = await guild.fetchBan(user.id);
     if (!logchannel) return;
-
+ 
     const modEmbed = new Discord.MessageEmbed()
         .setColor('#ff0000')
         .setTitle("Ban")
@@ -760,7 +770,7 @@ client.on('guildBanAdd', async function (guild, user) {
         .setFooter(`User ID: ${user.id}`)
     logchannel.send(modEmbed);
 })
-
+ 
 //leave log
 client.on('guildMemberRemove', member => {
     // Send the message to a designated channel on a server:
@@ -778,12 +788,12 @@ client.on('guildMemberRemove', member => {
         .setFooter(`User ID: ${member.user.id}`)
     logchannel.send(modEmbed);
 });
-
+ 
 //unbanned member
 client.on('guildBanRemove', async function (guild, user) {
     let logchannel = guild.channels.cache.get(logChannelID);
     if (!logchannel) return;
-
+ 
     guild.fetchAuditLogs()
         .then(audit => {
             const modEmbed = new Discord.MessageEmbed()
@@ -796,13 +806,13 @@ client.on('guildBanRemove', async function (guild, user) {
             logchannel.send(modEmbed);
         });
 })
-
+ 
 //deleted channel
 client.on('channelDelete', channel => {
     if (channel.type === 'dm') return;
     let logchannel = channel.guild.channels.cache.get(logChannelID);
     if (!logchannel) return;
-
+ 
     channel.guild.fetchAuditLogs()
         .then(audit => {
             const modEmbed = new Discord.MessageEmbed()

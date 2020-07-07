@@ -27,7 +27,7 @@ module.exports = {
             );
         }
         async function getURL() {
-            if (message.content.includes("www.youtube.com" || "youtu.be.com")) {
+            if (message.content.includes("www.youtube.com" || "youtu.be")) {
                 return ytdl.getInfo(args[1]);
             } else {
                 try {
@@ -215,7 +215,6 @@ module.exports = {
                 return;
             }
 
-
             const dispatcher = serverQueue.connection
                 .play(ytdl(song.url))
                 .on("finish", () => {
@@ -224,6 +223,7 @@ module.exports = {
                 })
                 .on("error", error => console.error(error));
             dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+            dispatcher.setBitrate(64);
             serverQueue.textChannel.send(`Now playing: **${song.title}**`);
         }
     },

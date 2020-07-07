@@ -5,8 +5,9 @@ module.exports = {
     needsowner: true,
     category: "owner",
     args: true,
-    execute(message, args) {
-        const evaluation = eval(args.join(" "))
+    needsqueue: true,
+    async execute(message, args, queue) {
+        const evaluation = await eval(args.join(" "))
         message.channel.send(`\`\`\`${evaluation}\`\`\``)
     },
 };

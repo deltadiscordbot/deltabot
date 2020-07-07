@@ -1,4 +1,3 @@
-const ytdl = require('ytdl-core');
 const Discord = require('discord.js');
 module.exports = {
     name: 'nowplaying',
@@ -22,6 +21,7 @@ module.exports = {
 
         const videoEmbed = new Discord.MessageEmbed()
             .setThumbnail(video.thumbnail)
+            .setURL(video.url)
             .setColor('#e9f931')
             .setTitle(video.title)
             .setDescription(description);
