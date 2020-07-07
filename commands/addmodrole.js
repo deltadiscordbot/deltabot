@@ -1,5 +1,4 @@
 const package = require('../package.json');
-var dbInstance;
 var currentModRoles;
 var modRoleAdding;
 module.exports = {
@@ -9,13 +8,13 @@ module.exports = {
   cooldown: 10,
   category: "admin",
   updatedb: true,
-  needsdb: true,
+
   needsadmin: true,
   args: true,
   guildOnly: true,
-  async execute(message, args, dbInstance) {
+  async execute(message, args) {
     modRoleAdding = args[0];
-    const items = await dbInstance.collection('config').findOne({});
+    const items = await message.client.dbInstance.collection('config').findOne({});
     currentModRoles = items.modroles;
     if (currentModRoles.includes(modRoleAdding)) {
       message.channel.send(`That role already has mod. Use ${items.prefix}removemodrole to remove it.`);
@@ -25,7 +24,7 @@ module.exports = {
 
       var myquery = { name: "settings" };
       var newvalue = { $set: { modroles: currentModRoles } };
-      dbInstance.collection("config").updateOne(myquery, newvalue, function (err, res) {
+      message.client.dbInstance.collection("config").updateOne(myquery, newvalue, function (err, res) {
         if (err) throw err;
         message.channel.send(`Successfully added ${message.guild.roles.cache.get(modRoleAdding)} as a mod role.`);
       });

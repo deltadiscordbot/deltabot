@@ -8,14 +8,14 @@ module.exports = {
     needshelper: true,
     guildOnly: true,
     args: true,
-    needsdb: true,
-    async execute(message, args, dbInstance) {
+
+    async execute(message, args) {
         var argsArray = Array.from(args);
         var tagName = argsArray.shift();
-        const items = await dbInstance.collection("tags").findOne({ name: tagName });
+        const items = await message.client.dbInstance.collection("tags").findOne({ name: tagName });
         if (items == null) {
             var myobj = { name: tagName.toString(), content: argsArray.join(" ") };
-            dbInstance.collection("tags").insertOne(myobj, function (err, res) {
+            message.client.dbInstance.collection("tags").insertOne(myobj, function (err, res) {
                 if (err) throw err;
                 message.reply(`tag ${tagName} was added.`)
             });

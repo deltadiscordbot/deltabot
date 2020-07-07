@@ -3,15 +3,15 @@ module.exports = {
 	name: 'slots',
 	description: 'Play slots. Default bet is 100.',
 	guildOnly: true,
-	needsdb: true,
+
 	usage: ['[bet]'],
 	aliases: ['spin'],
 	category: "eco",
-	async execute(message, args, dbInstance) {
+	async execute(message, args) {
 		let bet = 100;
 		let winnings = 0;
 		let leftMiddleRow, midMiddleRow, rightMiddleRow, slots, authorText;
-		const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+		const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
 		if (user == null) {
 			message.reply(`you do not have an account. Do \`!daily\` to make one.`)
 		} else {
@@ -99,7 +99,7 @@ module.exports = {
 							}
 							const myobj = { id: message.author.id };
 							const newvalues = { $set: { balance: newBalance, lastWin: lastWin, totalCredits: newTotal, slotsPlays: totalPlays } };
-							dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+							message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 								if (err) throw err;
 							});
 

@@ -4,10 +4,10 @@ module.exports = {
   description: 'Gets current versions of Riley\'s apps.',
   cooldown: 1,
   aliases: ['cv'],
-  needsdb: true,
+
   needsguild: true,
-  async execute(message, args, dbInstance) {
-    const dataItems = await dbInstance.collection('data').findOne({});
+  async execute(message, args) {
+    const dataItems = await message.client.dbInstance.collection('data').findOne({});
     appsList = dataItems.apps;
     //appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-beta clip, 7-clip
     const altstoreVersion = appsList[0];

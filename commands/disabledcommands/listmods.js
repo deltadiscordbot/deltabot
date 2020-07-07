@@ -9,11 +9,11 @@ module.exports = {
   updatedb: true,
   needsmod: true,
   guildOnly: true,
-  needsdb: true,
-  async execute(message, args, dbInstance) {
+
+  async execute(message, args) {
     if (message.guild.id == "625766896230334465") {
       var data = '';
-      const items = await dbInstance.collection('config').findOne({});
+      const items = await message.client.dbInstance.collection('config').findOne({});
       currentModRoles = items.modroles;
       currentModRoles.forEach(element => {
         currentRole = message.guild.roles.cache.get(element);

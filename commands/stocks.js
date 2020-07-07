@@ -7,16 +7,16 @@ module.exports = {
     description: 'Play the stock market.',
     category: "eco",
     guildOnly: true,
-    needsdb: true,
+
     aliases: ['stonks', 'stock', 'stonk', 'stonx', 'stonxmarket', 'stonksmarket', 'stockmarket'],
-    async execute(message, args, dbInstance) {
+    async execute(message, args) {
         const finnhub = require('finnhub');
         const defaultClient = finnhub.ApiClient.instance;
         const api_key = defaultClient.authentications['api_key'];
         api_key.apiKey = stocksAPIKey
         const api = new finnhub.DefaultApi()
         if (args.length) {
-            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+            const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
             const command = args.shift();
             switch (command.toString().toLowerCase()) {
                 case "buy":
@@ -59,7 +59,7 @@ module.exports = {
                                                                 stopReact.stop();
                                                                 msg.reactions.removeAll();
                                                                 const myobj = { ownerID: message.author.id, ownerName: message.author.tag, shareCount: buyingAmount, pricePerShare: parseInt(pricePerShare), totalPurchase: totalPurchase, symbol: symbol, dateBought: Date.now() };
-                                                                dbInstance.collection("stocks").insertOne(myobj, function (err, res) {
+                                                                message.client.dbInstance.collection("stocks").insertOne(myobj, function (err, res) {
                                                                     if (err) throw err;
                                                                     msg.edit(`${message.author}, purchase complete.`)
                                                                 });
@@ -70,7 +70,7 @@ module.exports = {
                                                                     totalStocks = user.totalStocks + buyingAmount;
                                                                 }
                                                                 const newvalues = { $set: { balance: newBalance, totalStocks: totalStocks } };
-                                                                dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
+                                                                message.client.dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
                                                                     if (err) throw err;
                                                                 });
 
@@ -111,7 +111,7 @@ module.exports = {
                     if (user != null) {
                         if (args.length) {
                             const symbol = args[0].toString().toUpperCase();
-                            const stocksOwned = await dbInstance.collection("stocks").find({ ownerID: message.author.id }).toArray();
+                            const stocksOwned = await message.client.dbInstance.collection("stocks").find({ ownerID: message.author.id }).toArray();
                             let stocksSelling = [];
                             stocksOwned.forEach(element => {
                                 if (element.symbol == symbol) {
@@ -165,12 +165,12 @@ module.exports = {
                                                             stopReact.stop();
                                                             msg.reactions.removeAll();
                                                             var myquery = { ownerID: message.author.id, symbol: symbol };
-                                                            dbInstance.collection("stocks").deleteMany(myquery, function (err, obj) {
+                                                            message.client.dbInstance.collection("stocks").deleteMany(myquery, function (err, obj) {
                                                                 if (err) throw err;
                                                             });
                                                             const myobj2 = { ownerID: message.author.id, ownerName: message.author.tag, shareCount: newShareCount, pricePerShare: parseInt(avgPricePerShare), totalPurchase: parseInt(newTotalPurchase), symbol: symbol, dateBought: Date.now() };
 
-                                                            dbInstance.collection("stocks").insertOne(myobj2, function (err, res) {
+                                                            message.client.dbInstance.collection("stocks").insertOne(myobj2, function (err, res) {
                                                                 if (err) throw err;
                                                             });
                                                             const myobj3 = { id: message.author.id };
@@ -181,7 +181,7 @@ module.exports = {
                                                             }
                                                             //const newTotalEarnings = user.totalCredits + (sellingAmount - totalPurchase);
                                                             const newvalues = { $set: { balance: newBalance, totalStocks: totalStocks } };
-                                                            dbInstance.collection("users").updateOne(myobj3, newvalues, function (err, res) {
+                                                            message.client.dbInstance.collection("users").updateOne(myobj3, newvalues, function (err, res) {
                                                                 if (err) throw err;
                                                                 msg.edit(`${message.author}, sale complete. New balance is ${newBalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`)
                                                             });
@@ -288,7 +288,7 @@ module.exports = {
                 case "list":
                 case "portfolio":
                     if (user != null) {
-                        const stocksOwned = await dbInstance.collection("stocks").find({ ownerID: message.author.id }).toArray();
+                        const stocksOwned = await message.client.dbInstance.collection("stocks").find({ ownerID: message.author.id }).toArray();
                         let stockSymbols = [];
                         let stockCounts = [];
                         let stockPrices = [];

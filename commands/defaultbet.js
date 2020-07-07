@@ -5,9 +5,9 @@ module.exports = {
     guildOnly: true,
     category: "eco",
     args: true,
-    needsdb: true,
-    async execute(message, args, dbInstance) {
-        const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+
+    async execute(message, args) {
+        const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
         if (user != null) {
             let bet = 100;
             if (isNaN(args[0]) || args[0] == Infinity || parseInt(args[0]) < 1 || args[0].toString().includes(".", ",")) {
@@ -18,7 +18,7 @@ module.exports = {
             }
             const myobj = { id: message.author.id };
             const newvalues = { $set: { defaultBet: bet } };
-            dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+            message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                 if (err) throw err;
                 message.reply(`new default bet has been set.`)
             });

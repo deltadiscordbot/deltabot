@@ -8,12 +8,12 @@ module.exports = {
     category: "mod",
     guildOnly: true,
     args: true,
-    needsdb: true,
-    async execute(message, args, dbInstance) {
-        const items = await dbInstance.collection("tags").findOne({ name: args.toString() });
+
+    async execute(message, args) {
+        const items = await message.client.dbInstance.collection("tags").findOne({ name: args.toString() });
         if (items != null) {
             var myobj = { name: args.toString() };
-            dbInstance.collection("tags").deleteOne(myobj, function (err, res) {
+            message.client.dbInstance.collection("tags").deleteOne(myobj, function (err, res) {
                 if (err) throw err;
                 message.reply(`tag ${args.toString()} was deleted.`)
             });

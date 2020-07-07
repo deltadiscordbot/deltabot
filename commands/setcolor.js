@@ -4,10 +4,10 @@ module.exports = {
     cooldown: 10,
     guildOnly: true,
     args: true,
-    needsdb: true,
+
     category: "eco",
-    async execute(message, args, dbInstance) {
-        const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+    async execute(message, args) {
+        const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
         if (user != null) {
             let newColor = args[0].toString();
             if (args[0].substring(0, 1) != "#") {
@@ -16,7 +16,7 @@ module.exports = {
             if (/^#[0-9A-F]{6}$/i.test(newColor)) {
                 const myobj = { id: message.author.id };
                 const newvalues = { $set: { color: args[0].toString() } };
-                dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+                message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                     if (err) throw err;
                     message.reply(`new color has been set.`)
                 });

@@ -7,8 +7,8 @@ module.exports = {
     needsowner: true,
     cooldown: 1,
     category: "owner",
-    needsdb: true,
-    async execute(message, args, dbInstance) {
+
+    async execute(message, args) {
         displayName = args.shift()
         newTrainingPhrases = args.join(" ").split("^")
         messageTexts = [displayName];

@@ -2,10 +2,10 @@ module.exports = {
 	name: 'balance',
 	description: 'Gets credits balance.',
 	guildOnly: true,
-	needsdb: true,
+
 	category: "eco",
 	aliases: ['bal'],
-	async execute(message, args, dbInstance) {
+	async execute(message, args) {
 		const client = message.client;
 		let userObject;
 		if (args.length) {
@@ -21,7 +21,7 @@ module.exports = {
 		} else {
 			userObject = message.author
 		}
-		const user = await dbInstance.collection("users").findOne({ id: userObject.id });
+		const user = await message.client.dbInstance.collection("users").findOne({ id: userObject.id });
 		if (user == null) {
 			message.reply(`${userObject.tag} does not have an account. Do \`!daily\` to make one.`)
 		} else {

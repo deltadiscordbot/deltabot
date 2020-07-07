@@ -5,9 +5,9 @@ module.exports = {
     category: "eco",
     guildOnly: true,
     args: true,
-    needsdb: true, aliases: ['coin', 'flipcoin', 'coins', 'flipcoins', 'flipacoin'],
-    async execute(message, args, dbInstance) {
-        const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+    aliases: ['coin', 'flipcoin', 'coins', 'flipcoins', 'flipacoin'],
+    async execute(message, args) {
+        const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
         //Check if user has an account
         if (user == null) {
             message.reply(`you do not have an account. Do \`!daily\` to make one.`)
@@ -60,7 +60,7 @@ module.exports = {
             }
             const myobj = { id: message.author.id };
             const newvalues = { $set: { balance: newBalance, lastWin: lastWin, totalCredits: newTotal, coinflipplays: totalPlays } };
-            dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+            message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                 if (err) throw err;
                 let resultMessage = new Discord.MessageEmbed()
                     .setTitle(userWon ? `You won ${bet} credits` : `You lost ${bet} credits`)

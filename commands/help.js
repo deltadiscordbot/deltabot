@@ -7,9 +7,9 @@ module.exports = {
     aliases: ['commands'],
     usage: '[command name]',
     cooldown: 5,
-    needsdb: true,
-    async execute(message, args, dbInstance) {
-        const items = await dbInstance.collection('config').findOne({});
+
+    async execute(message, args) {
+        const items = await message.client.dbInstance.collection('config').findOne({});
         prefix = await items.prefix;
         const { commands } = message.client;
         let currentString = '';

@@ -12,17 +12,17 @@ module.exports = {
   category: "admin",
   needsadmin: true,
   args: true,
-  needsdb: true,
-  async execute(message, args, dbInstance) {
+
+  async execute(message, args) {
     modRoleRemoving = args[0];
-    const items = await dbInstance.collection('config').findOne({});
+    const items = await message.client.dbInstance.collection('config').findOne({});
     currentModRoles = items.modroles;
     if (currentModRoles.includes(modRoleRemoving)) {
       const index = currentModRoles.indexOf(modRoleRemoving);
       currentModRoles.splice(index, 1);
       var myquery = { name: "settings" };
       var newvalue = { $set: { modroles: currentModRoles } };
-      dbInstance.collection("config").updateOne(myquery, newvalue, function (err, res) {
+      message.client.dbInstance.collection("config").updateOne(myquery, newvalue, function (err, res) {
         if (err) throw err;
         message.channel.send(`Successfully removed ${message.guild.roles.cache.get(modRoleRemoving)} as a mod role.`);
       });

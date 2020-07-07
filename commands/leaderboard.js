@@ -3,11 +3,11 @@ module.exports = {
     name: 'leaderboard',
     description: 'Top credit earners.',
     guildOnly: true,
-    needsdb: true,
+
     category: "eco",
     aliases: ['top'],
-    async execute(message, args, dbInstance) {
-        dbInstance.collection("users").find({}).toArray(function (err, result) {
+    async execute(message, args) {
+        message.client.dbInstance.collection("users").find({}).toArray(function (err, result) {
             if (err) throw err;
             let userList = [];
             result.forEach(element => {

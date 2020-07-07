@@ -3,9 +3,9 @@ module.exports = {
     name: 'profile',
     description: 'Check account profile.',
     guildOnly: true,
-    needsdb: true,
+
     category: "eco",
-    async execute(message, args, dbInstance) {
+    async execute(message, args) {
         const client = message.client;
         let userID;
         let user = null;
@@ -26,7 +26,7 @@ module.exports = {
             message.reply("please enter a valid user.")
             return;
         }
-        user = await dbInstance.collection("users").findOne({ id: mentionedUser.id });
+        user = await message.client.dbInstance.collection("users").findOne({ id: mentionedUser.id });
         if (user != null) {
             const balance = user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             let lastWin = 0;
@@ -44,7 +44,7 @@ module.exports = {
                 lastWin = user.lastWin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
             if (user.floorsOwned != undefined) {
-                const floorData = await dbInstance.collection("hotel").find({}).toArray();
+                const floorData = await message.client.dbInstance.collection("hotel").find({}).toArray();
                 for (let index = 0; index < (floorData.length); index++) {
                     if (floorData[index].ownerID == mentionedUser.id) {
                         floorsOwned += `${floorData[index].floor}, `

@@ -3,14 +3,14 @@ module.exports = {
 	name: 'connect4',
 	description: 'Play connect 4 with someone else. Must have another player. Default bet is 100.',
 	guildOnly: true,
-	needsdb: true,
+
 	cooldown: 3,
 	category: "eco",
 	usage: ['(opponent) [bet]'],
 	aliases: ['con4', 'con'],
-	async execute(message, args, dbInstance) {
+	async execute(message, args) {
 		let bet = 100;
-		const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+		const user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
 		if (user == null) {
 			message.reply(`you do not have an account. Do \`!daily\` to make one.`)
 		} else {
@@ -293,12 +293,12 @@ module.exports = {
 					}
 					const myobj = { id: message.author.id };
 					const newvalues = { $set: { balance: newBalancep1, lastWin: lastWin, totalCredits: newTotal, con4Plays: totalPlays, con4Wins: conWins } };
-					dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+					message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 						if (err) throw err;
 					});
 					const myobj2 = { id: player2.id };
 					const newvalues2 = { $set: { balance: newBalancep2, lastWin: lastWin2, totalCredits: newTotal2, con4Plays: totalPlays2, con4Wins: conWins2 } };
-					dbInstance.collection("users").updateOne(myobj2, newvalues2, function (err, res) {
+					message.client.dbInstance.collection("users").updateOne(myobj2, newvalues2, function (err, res) {
 						if (err) throw err;
 					});
 
@@ -336,7 +336,7 @@ module.exports = {
 						const stopFilter = (reaction, user) => reaction.emoji.name === '❌' && user.id == message.author.id;
 						const stopReact = msg.createReactionCollector(stopFilter, { timer: 30000, idle: 30000, dispose: true });
 						playReact.on("collect", (r, u) => {
-							dbInstance.collection("users").findOne({ id: u.id })
+							message.client.dbInstance.collection("users").findOne({ id: u.id })
 								.then(player2 => {
 									if (player2 == null) {
 										message.channel.send(`${u}, you do not have an account. Do \`!daily\` to make one.`)

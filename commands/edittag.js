@@ -8,15 +8,15 @@ module.exports = {
     category: "mod",
     guildOnly: true,
     args: true,
-    needsdb: true,
-    async execute(message, args, dbInstance) {
+
+    async execute(message, args) {
         var argsArray = Array.from(args);
         var tagName = argsArray.shift();
-        const items = await dbInstance.collection("tags").findOne({ name: tagName });
+        const items = await message.client.dbInstance.collection("tags").findOne({ name: tagName });
         if (items != null) {
             var myobj = { name: tagName };
             var newvalues = { $set: { name: tagName, content: argsArray.join(" ") } };
-            dbInstance.collection("tags").updateOne(myobj, newvalues, function (err, res) {
+            message.client.dbInstance.collection("tags").updateOne(myobj, newvalues, function (err, res) {
                 if (err) throw err;
                 message.reply(`tag ${tagName} was edited.`)
             });

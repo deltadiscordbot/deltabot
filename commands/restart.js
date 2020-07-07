@@ -3,7 +3,7 @@ module.exports = {
 	name: 'restart',
 	description: 'Restarts the bot. (Owner only)',
 	needsowner: true,
-	needsdb: true,
+
 	category: "owner",
 	execute(message, args) {
 		message.reply("restarting")

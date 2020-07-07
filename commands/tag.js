@@ -6,13 +6,13 @@ module.exports = {
     usage: ['(tag name)'],
     cooldown: 1,
     guildOnly: true,
-    needsdb: true,
+
     aliases: ['tags', 't'],
-    async execute(message, args, dbInstance) {
+    async execute(message, args) {
         if (args.length) {
-            const items = await dbInstance.collection("tags").findOne({ name: args.toString() });
+            const items = await message.client.dbInstance.collection("tags").findOne({ name: args.toString() });
             if (items == null) {
-                const tags = await dbInstance.collection("tags").find({}).toArray();
+                const tags = await message.client.dbInstance.collection("tags").find({}).toArray();
                 let data = "";
                 let listCount = 0;
                 tags.forEach(element => {
@@ -49,7 +49,7 @@ module.exports = {
         } else {
             var listCount = 0;
             var data = '';
-            dbInstance.collection("tags").find({}).toArray(function (err, result) {
+            message.client.dbInstance.collection("tags").find({}).toArray(function (err, result) {
                 if (err) throw err;
                 result.forEach(element => {
                     data += element.name;

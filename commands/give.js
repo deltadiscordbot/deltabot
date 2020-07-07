@@ -4,15 +4,15 @@ module.exports = {
 	guildOnly: true,
 	category: "eco",
 	args: true,
-	needsdb: true,
+
 	aliases: ['pay'],
-	async execute(message, args, dbInstance) {
+	async execute(message, args) {
 		if (args.length == 2) {
 			if (message.mentions.users.size == 1) {
 				if (message.mentions.users.first().id != message.author.id) {
 					if (parseInt(args[1]) > 0) {
-						const user = await dbInstance.collection("users").findOne({ id: message.mentions.users.first().id });
-						const owner = await dbInstance.collection("users").findOne({ id: message.author.id });
+						const user = await message.client.dbInstance.collection("users").findOne({ id: message.mentions.users.first().id });
+						const owner = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
 						if (owner == null) {
 							message.reply("you do not have an account. You can make one by doing \`!daily\`.");
 							return;
@@ -26,12 +26,12 @@ module.exports = {
 							const ownerBalance = owner.balance - parseInt(args[1]);
 							const newvalues = { $set: { balance: balance } };
 							const myobj = { id: message.mentions.users.first().id };
-							dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+							message.client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
 								if (err) throw err;
 							});
 							const newvalues2 = { $set: { balance: ownerBalance } };
 							const myobj2 = { id: message.author.id };
-							dbInstance.collection("users").updateOne(myobj2, newvalues2, function (err, res) {
+							message.client.dbInstance.collection("users").updateOne(myobj2, newvalues2, function (err, res) {
 								if (err) throw err;
 								message.reply(`${parseInt(args[1])} credit${Math.abs(args[1]) === 1 ? "" : "s"} have been added to ${message.mentions.users.first()}'s account. Your new balance is ${ownerBalance} and theirs is ${balance}.`)
 							});

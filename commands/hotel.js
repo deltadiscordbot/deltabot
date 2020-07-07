@@ -3,20 +3,20 @@ module.exports = {
     name: 'hotel',
     description: 'Visit DeltaBot Hotel. \`!hotel\` for a guide.',
     guildOnly: true,
-    needsdb: true,
+
     category: "eco",
     aliases: ['floor', 'floors'],
-    async execute(message, args, dbInstance) {
+    async execute(message, args) {
         if (args.length) {
             let user;
             switch (args[0].toString().toLowerCase()) {
                 case "buy":
-                    user = await dbInstance.collection("users").findOne({ id: message.author.id });
+                    user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
                     if (user != null) {
                         if (user.hotelbanned == undefined) {
                             if (!isNaN(args[1])) {
                                 const buyingFloor = parseInt(args[1]);
-                                const floorData = await dbInstance.collection("hotel").findOne({ floor: buyingFloor });
+                                const floorData = await message.client.dbInstance.collection("hotel").findOne({ floor: buyingFloor });
                                 if (floorData == null) {
                                     let ownedFloors = 0;
                                     let basePrice = 1000;
@@ -79,7 +79,7 @@ module.exports = {
                                                                                                 .then(msg2 => {
 
                                                                                                     const myobj = { floor: buyingFloor, floorName: floorName, floorDescription: floorDescription, floorIcon: floorIcon, ownerID: message.author.id, ownerName: message.author.tag, price: buyingPrice };
-                                                                                                    dbInstance.collection("hotel").insertOne(myobj, function (err, res) {
+                                                                                                    message.client.dbInstance.collection("hotel").insertOne(myobj, function (err, res) {
                                                                                                         if (err) throw err;
                                                                                                         msg.edit("Floor purchase complete.")
                                                                                                     });
@@ -90,7 +90,7 @@ module.exports = {
                                                                                                         newFloorsOwned = user.floorsOwned + 1;
                                                                                                     }
                                                                                                     const newvalues = { $set: { balance: newBalance, floorsOwned: newFloorsOwned } };
-                                                                                                    dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
+                                                                                                    message.client.dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
                                                                                                         if (err) throw err;
                                                                                                     });
                                                                                                 })
@@ -150,11 +150,11 @@ module.exports = {
                     }
                     break;
                 case "sell":
-                    user = await dbInstance.collection("users").findOne({ id: message.author.id });
+                    user = await message.client.dbInstance.collection("users").findOne({ id: message.author.id });
                     if (user != null) {
                         if (!isNaN(args[1])) {
                             const sellingFloor = parseInt(args[1]);
-                            const floorData = await dbInstance.collection("hotel").findOne({ floor: sellingFloor });
+                            const floorData = await message.client.dbInstance.collection("hotel").findOne({ floor: sellingFloor });
                             if (floorData != null) {
                                 const sellingPrice = floorData.price / 2;
                                 if (floorData.ownerID == message.author.id) {
@@ -174,11 +174,11 @@ module.exports = {
                                                 const newFloorsOwned = user.floorsOwned - 1;
                                                 const myobj2 = { id: message.author.id };
                                                 const newvalues = { $set: { balance: newBalance, floorsOwned: newFloorsOwned } };
-                                                dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
+                                                message.client.dbInstance.collection("users").updateOne(myobj2, newvalues, function (err, res) {
                                                     if (err) throw err;
                                                 });
                                                 const myobj3 = { floor: sellingFloor };
-                                                dbInstance.collection("hotel").deleteOne(myobj3, function (err, res) {
+                                                message.client.dbInstance.collection("hotel").deleteOne(myobj3, function (err, res) {
                                                     if (err) throw err;
                                                     msg.edit(`Floor ${sellingFloor} was sold for ${sellingPrice}.`)
                                                 });
@@ -210,7 +210,7 @@ module.exports = {
                     break;
                 case "top":
                 case "leaderboard":
-                    dbInstance.collection("users").find({}).toArray(function (err, result) {
+                    message.client.dbInstance.collection("users").find({}).toArray(function (err, result) {
                         if (err) throw err;
                         let userList = [];
                         result.forEach(element => {
@@ -247,7 +247,7 @@ module.exports = {
                     break;
                 case "floors":
                 case "list":
-                    dbInstance.collection("hotel").find({}).toArray(function (err, result) {
+                    message.client.dbInstance.collection("hotel").find({}).toArray(function (err, result) {
                         if (err) throw err;
                         let floorList = [];
                         result.forEach(element => {
@@ -281,13 +281,13 @@ module.exports = {
                     break;
                 case "edit":
                 case "change":
-                    editFloor(message, args, dbInstance); //Seperating into another function to not destroy my sanity
+                    editFloor(message, args); //Seperating into another function to not destroy my sanity
                     break;
                 default:
                     if (args.length == 1) {
                         if (!isNaN(args[0]) || args[0].toLowerCase() === "nan") {
                             const getFloor = parseInt(args[0]);
-                            const floorData = await dbInstance.collection("hotel").findOne({ floor: getFloor });
+                            const floorData = await message.client.dbInstance.collection("hotel").findOne({ floor: getFloor });
                             if (floorData != null) {
                                 const floorEmbed = new Discord.MessageEmbed()
                                     .setTitle(floorData.floorName.toString().substring(0, 256))
@@ -315,7 +315,7 @@ module.exports = {
             message.channel.send(embed)
         }
 
-        async function editFloor(message, args, dbInstance) {
+        async function editFloor(message, args) {
             //If user didnt specify floor, send usage directions
             if (!args[1]) {
                 const embed = new Discord.MessageEmbed()
@@ -328,7 +328,7 @@ module.exports = {
             }
             if (isNaN(args[1])) return message.reply("That is not a valid number!");
             let selectedFloor = parseInt(args[1]);
-            const currentFloorData = await dbInstance.collection("hotel").findOne({ floor: selectedFloor });
+            const currentFloorData = await message.client.dbInstance.collection("hotel").findOne({ floor: selectedFloor });
             if (currentFloorData == null) return message.reply("That floor has not been bought by anyone!");
             //Check if user owns floor
             if (currentFloorData.ownerID !== message.author.id) return message.reply('You do not own this floor!!');
@@ -394,7 +394,7 @@ module.exports = {
                 //Update the document!!
                 const myobj = { floor: floorLevel };
                 const newvalues = { $set: { [`floor${fieldToEdit}`]: newFloorInfoMessage } };
-                dbInstance.collection("hotel").updateOne(myobj, newvalues, function (err, res) {
+                message.client.dbInstance.collection("hotel").updateOne(myobj, newvalues, function (err, res) {
                     if (err) throw err;
                     message.channel.send("Edited the floor!");
                 });

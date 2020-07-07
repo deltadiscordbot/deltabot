@@ -5,9 +5,9 @@ module.exports = {
   cooldown: 10,
   updatedb: true,
   guildOnly: true,
-  needsdb: true,
+
   aliases: ['lookup'],
-  async execute(message, args, dbInstance) {
+  async execute(message, args) {
     const client = message.client;
     let userObject;
     if (args.length) {
@@ -35,7 +35,7 @@ module.exports = {
     const userJoinPosition = sortedmembers.indexOf(memberObject) + 1
     let fields = [{ name: "User created:", value: userCreated, inline: true }, { name: "Joined server:", value: userJoinedServer, inline: true }, { name: "Join position:", value: userJoinPosition, inline: true }, { name: "User roles:", value: userRoles, inline: true }]
     let color = "#8A28F7";
-    user = await dbInstance.collection("users").findOne({ id: userObject.id })
+    user = await message.client.dbInstance.collection("users").findOne({ id: userObject.id })
     if (user != null) {
       coloe = user.color;
       if (user.specialack) {

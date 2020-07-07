@@ -1,6 +1,7 @@
+const Discord = require('discord.js');
+const client = new Discord.Client();
 const fs = require('fs');
 const queue = new Map();
-const Discord = require('discord.js');
 let { prefix } = require('./config.json');
 const { projectId, mainSourceURL, alphaSourceURL, ownerID, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
 const dialogflow = require('@google-cloud/dialogflow');
@@ -8,7 +9,6 @@ const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 require('log-timestamp')(function () { return new Date().toLocaleString() + ' "%s"' });
-const client = new Discord.Client();
 //const Twitter = require('twitter-lite');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -18,7 +18,7 @@ let announceChannels = [], betaannounceChannels = [], supportchannels = [];
 const betaRole = "<@&716483174028410962>";
 const alphaRole = "<@&716483589692325900>";
 const settings = { method: "Get" };
-let databaseClient, altstoreApps, dbInstance, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
+let databaseClient, altstoreApps, welcomechannelID, helperRoles, modRoles, logChannelID, oldClipBetaVersion, oldClipVersion, oldAltstoreVersion, oldDeltaVersion, oldAltstoreBetaVersion, oldAltstoreAlphaVersion, oldDeltaAlphaVersion, oldDeltaBetaVersion, appsList, newClipBetaVersion, newClipVersion, newAltstoreData, newDeltaData, newAltstoreVersion, newDeltaVersion, newAltstoreBetaVersion, newDeltaBetaVersion;
 const consoles = [`DS games on Delta`, `N64 games on Delta`, `GBA games on Delta`, `GBC games on Delta`, `SNES games on Delta`, `NES games on Delta`];
 
 // const twitterClient = new Twitter({
@@ -80,7 +80,7 @@ function updateVersions() {
                 appsList[0] = newAltstoreVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -101,7 +101,7 @@ function updateVersions() {
                 appsList[2] = newAltstoreBetaVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -125,7 +125,7 @@ function updateVersions() {
                 appsList[1] = newDeltaVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -147,7 +147,7 @@ function updateVersions() {
                 appsList[3] = newDeltaBetaVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -171,7 +171,7 @@ function updateVersions() {
                 appsList[6] = newClipBetaVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -195,7 +195,7 @@ function updateVersions() {
                 appsList[7] = newClipVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -236,7 +236,7 @@ function updateVersions() {
                 appsList[4] = newAltstoreVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -261,7 +261,7 @@ function updateVersions() {
                 appsList[5] = newDeltaVersion;
                 var myquery = { name: "versions" };
                 var newvalue = { $set: { apps: appsList } };
-                dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
+                client.dbInstance.collection("data").updateOne(myquery, newvalue, function (err, res) {
                     if (err) throw err;
                     updateVars();
                     const modEmbed = new Discord.MessageEmbed()
@@ -284,7 +284,7 @@ function updateVersions() {
         });
 };
 async function updateVars() {
-    const dataItems = await dbInstance.collection('data').findOne({});
+    const dataItems = await client.dbInstance.collection('data').findOne({});
     appsList = dataItems.apps;
     // appsList 0-altstore, 1-delta, 2-beta altstore, 3-beta delta, 4-alpha altstore, 5-alpha delta, 6-clip beta, 7-clip
     oldAltstoreVersion = appsList[0];
@@ -295,7 +295,7 @@ async function updateVars() {
     oldDeltaAlphaVersion = appsList[5];
     oldClipBetaVersion = appsList[6];
     oldClipVersion = appsList[7];
-    const items = await dbInstance.collection('config').findOne({});
+    const items = await client.dbInstance.collection('config').findOne({});
     prefix = items.prefix;
     welcomechannelID = items.welcomechannel;
     modRoles = items.modroles;
@@ -324,9 +324,7 @@ async function updateVars() {
 }
 
 async function exeCommand(command, message, args) {
-    if (command.needsdb) {
-        await command.execute(message, args, dbInstance)
-    } else if (command.needsqueue) {
+    if (command.needsqueue) {
         if (message.channel.name == "delta-bot" || message.channel.name == "music" || message.author.id == ownerID || message.channel.name == "bot-commands") {
             await command.execute(message, args, queue);
         }
@@ -353,7 +351,7 @@ client.once('ready', async () => {
     databaseClient = await MongoClient.connect(mongodbase, {
         useUnifiedTopology: true,
     });
-    dbInstance = databaseClient.db(currentdb)
+    client.dbInstance = databaseClient.db(currentdb)
     updateVars();
     updateVersions();
     setInterval(updateVersions, 60000);
@@ -485,17 +483,17 @@ async function detectIntent(
 client.on('message', async message => {
     if (message.author.bot || message.channel.type === 'dm') return; //Bots don't deserve credits.
     if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
-        const messageLog = await dbInstance.collection("logs").findOne({ channelid: message.channel.id });
+        const messageLog = await client.dbInstance.collection("logs").findOne({ channelid: message.channel.id });
         if (messageLog != null) {
             const newCount = messageLog.messageCount + 1;
             const myobj = { channelid: message.channel.id };
             const newvalues = { $set: { messageCount: newCount, lastmessage: Date.now() } };
-            dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
+            client.dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
                 if (err) throw err;
             });
         } else {
             var myobj = { channelid: message.channel.id, channelname: message.channel.name, guildID: message.guild.id, guildname: message.guild.name, messageCount: 1, lastmessage: Date.now() };
-            dbInstance.collection("logs").insertOne(myobj, function (err, res) {
+            client.dbInstance.collection("logs").insertOne(myobj, function (err, res) {
                 if (err) throw err;
             });
         }
@@ -519,7 +517,7 @@ client.on('message', async message => {
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
     setTimeout(async () => {
         try {
-            const user = await dbInstance.collection("users").findOne({ id: message.author.id });
+            const user = await client.dbInstance.collection("users").findOne({ id: message.author.id });
             if (user == null) {
                 return;
             } else {
@@ -532,7 +530,7 @@ client.on('message', async message => {
                 }
                 const myobj = { id: message.author.id };
                 const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
-                dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
+                client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
                     if (err) throw err;
                     return;
                 });
@@ -678,7 +676,7 @@ client.on('message', async message => {
     const result = await (await detectIntent(projectId, sessionID, message.content, "en-US")).queryResult;
     console.log(result["intentDetectionConfidence"])
     if (parseFloat(result["intentDetectionConfidence"]) > .70 && result["fulfillmentText"].length > 1) {
-        const items = await dbInstance.collection("tags").findOne({ name: result["fulfillmentText"].toString() });
+        const items = await client.dbInstance.collection("tags").findOne({ name: result["fulfillmentText"].toString() });
         if (items != null) message.channel.send(eval('`' + items.content + '`'));
     }
 })
