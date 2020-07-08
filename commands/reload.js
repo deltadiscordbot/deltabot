@@ -6,6 +6,15 @@ module.exports = {
 	execute(message, args) {
 		if (!args.length) {
 			let currentCommand = '';
+			const fs = require('fs');
+			const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+			for (const file of commandFiles) {
+				const command = require(`../commands/${file}`);
+
+				// set a new item in the Collection
+				// with the key as the command name and the value as the exported module
+				message.client.commands.set(command.name, command);
+			}
 			message.client.commands.forEach(async element => {
 				currentCommand = await message.client.commands.get(element.name)
 				delete require.cache[require.resolve(`./${currentCommand.name}.js`)];

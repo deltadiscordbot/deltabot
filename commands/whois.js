@@ -3,9 +3,7 @@ module.exports = {
   name: 'whois',
   description: `Shows information about a user`,
   cooldown: 10,
-  updatedb: true,
   guildOnly: true,
-
   aliases: ['lookup'],
   async execute(message, args) {
     const client = message.client;
