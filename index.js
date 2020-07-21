@@ -3,6 +3,7 @@ const client = new Discord.Client();
 const fs = require('fs');
 const queue = new Map();
 let { prefix } = require('./config.json');
+client.prefix = prefix;
 const { projectId, mainSourceURL, alphaSourceURL, ownerID, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
 const dialogflow = require('@google-cloud/dialogflow');
 const package = require('./package.json');
@@ -296,7 +297,7 @@ async function updateVars() {
     oldClipBetaVersion = appsList[6];
     oldClipVersion = appsList[7];
     const items = await client.dbInstance.collection('config').findOne({});
-    prefix = items.prefix;
+    client.prefix = items.prefix;
     welcomechannelID = items.welcomechannel;
     modRoles = items.modroles;
     helperRoles = items.helperroles;
@@ -343,11 +344,21 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
+fs.readdir('./events/', (err, files) => {
+    if (err) {
+        return console.error(err);
+    }
+    return files.forEach((file) => {
+        const event = require(`./events/${file}`);
+        const eventName = file.split('.')[0];
+        client.on(eventName, event.bind(null, client));
+    });
+});
 const deltaDiscordID = "625714187078860810", altstoreDiscordID = "625766896230334465";
 let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
 
-
 client.once('ready', async () => {
+
     databaseClient = await MongoClient.connect(mongodbase, {
         useUnifiedTopology: true,
     });
@@ -359,6 +370,7 @@ client.once('ready', async () => {
     deltaDiscord = client.guilds.cache.get(deltaDiscordID)
     altstoreDiscord = client.guilds.cache.get(altstoreDiscordID);
     initReactionRoles();
+    client.logging = false;
 });
 
 function initReactionRoles() {
@@ -479,78 +491,14 @@ async function detectIntent(
     return responses[0];
 }
 
-//This event listener handles all messages and gives credits to users
-client.on('message', async message => {
-    if (message.author.bot || message.channel.type === 'dm') return; //Bots don't deserve credits.
-    if (message.guild.id == deltaDiscordID || message.guild.id == altstoreDiscordID) {
-        const messageLog = await client.dbInstance.collection("logs").findOne({ channelid: message.channel.id });
-        if (messageLog != null) {
-            const newCount = messageLog.messageCount + 1;
-            const myobj = { channelid: message.channel.id };
-            const newvalues = { $set: { messageCount: newCount, lastmessage: Date.now() } };
-            client.dbInstance.collection("logs").updateOne(myobj, newvalues, function (err, res) {
-                if (err) throw err;
-            });
-        } else {
-            var myobj = { channelid: message.channel.id, channelname: message.channel.name, guildID: message.guild.id, guildname: message.guild.name, messageCount: 1, lastmessage: Date.now() };
-            client.dbInstance.collection("logs").insertOne(myobj, function (err, res) {
-                if (err) throw err;
-            });
-        }
-    }
-
-    if (!cooldowns.has("lastMessage")) {
-        cooldowns.set("lastMessage", new Discord.Collection());
-    }
-
-    const now = Date.now();
-    const timestamps = cooldowns.get('lastMessage');
-    const cooldownAmount = 60_000;
-
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-        if (now < expirationTime) {
-            return;
-        }
-    }
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    setTimeout(async () => {
-        try {
-            const user = await client.dbInstance.collection("users").findOne({ id: message.author.id });
-            if (user == null) {
-                return;
-            } else {
-                const randCredits = Math.floor(Math.random() * (100 - 10)) + 10;
-                const newbalance = user.balance + randCredits;
-                const newTotal = user.totalCredits + randCredits;
-                let talkCredits = 0;
-                if (user.talkCredits != undefined) {
-                    talkCredits = user.talkCredits + randCredits;
-                }
-                const myobj = { id: message.author.id };
-                const newvalues = { $set: { balance: newbalance, totalCredits: newTotal, talkCredits: talkCredits } };
-                client.dbInstance.collection("users").updateOne(myobj, newvalues, function (err, res) {
-                    if (err) throw err;
-                    return;
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            message.reply('There was an error while trying to manage xp!');
-        }
-    }, 1000);
-})
-
-
 //This event listener handles all bot commands
 client.on('message', message => {
-    if (!(message.content.startsWith(prefix) || message.mentions.users.first() == client.user) || message.author.bot) return;
+    if (!(message.content.startsWith(client.prefix) || message.mentions.users.first() == client.user) || message.author.bot) return;
     var args;
-    if (message.content.startsWith(prefix)) {
-        args = message.content.slice(prefix.length).split(/ +/);
+    if (message.content.startsWith(client.prefix)) {
+        args = message.content.slice(client.prefix.length).split(/ +/);
     } else {
-        args = message.content.slice(prefix.length).split(/ +/).slice(1);
+        args = message.content.slice(client.prefix.length).split(/ +/).slice(1);
     }
     const commandName = args.shift().toLowerCase();
 
@@ -660,6 +608,7 @@ client.on('message', message => {
 
 //AI helper
 client.on('message', async message => {
+    if (message.author.bot || message.channel.type === 'dm') return;
     let isMod = false, isHelper = false;
     modRoles.forEach(element => {
         if (message.member.roles.cache.has(element) || message.member.hasPermission(['ADMINISTRATOR'])) {
@@ -671,10 +620,13 @@ client.on('message', async message => {
             isHelper = true;
         }
     })
-    if (!supportchannels.includes(message.channel) || message.content.length < 20 || message.author.bot || message.content.startsWith(prefix) || ((supportchannels.includes(message.channel) && message.channel.name != "delta-bot") && (isHelper || isMod))) return;
+    if (!supportchannels.includes(message.channel) || message.content.length < 10 || message.author.bot || message.content.startsWith(client.prefix) || ((supportchannels.includes(message.channel) && message.channel.name != "delta-bot") && (isHelper || isMod))) return;
     const sessionID = Math.floor(1000000 + Math.random() * 9000000).toString();
     const result = await (await detectIntent(projectId, sessionID, message.content, "en-US")).queryResult;
-    console.log(result["intentDetectionConfidence"])
+    if (client.logging && result["intentDetectionConfidence"] > 0) {
+        const deltaBotChannel = message.guild.channels.cache.find(channel => channel.name === "delta-bot");
+        deltaBotChannel.send(`Confidence: \`${result["intentDetectionConfidence"].toFixed(3)}\``);
+    }
     if (parseFloat(result["intentDetectionConfidence"]) > .70 && result["fulfillmentText"].length > 1) {
         const items = await client.dbInstance.collection("tags").findOne({ name: result["fulfillmentText"].toString() });
         if (items != null) message.channel.send(eval('`' + items.content + '`'));
@@ -768,10 +720,19 @@ client.on('guildBanAdd', async function (guild, user) {
         .setFooter(`User ID: ${user.id}`)
     logchannel.send(modEmbed);
 })
- 
+ */
 //leave log
-client.on('guildMemberRemove', member => {
-    // Send the message to a designated channel on a server:
+client.on('guildMemberRemove', async member => {
+    const user = await client.dbInstance.collection("alerts").findOne({ id: member.id });
+    if (user != null) {
+        var myquery = { id: member.id };
+        client.dbInstance.collection("alerts").deleteOne(myquery, function (err, obj) {
+            if (err) throw err;
+        });
+
+    }
+
+    /*// Send the message to a designated channel on a server:
     let logchannel = member.guild.channels.cache.get(logChannelID);
     // Do nothing if the channel wasn't found on this server
     if (!logchannel) return;
@@ -785,43 +746,44 @@ client.on('guildMemberRemove', member => {
         .setTimestamp()
         .setFooter(`User ID: ${member.user.id}`)
     logchannel.send(modEmbed);
+    */
 });
- 
+/*
 //unbanned member
 client.on('guildBanRemove', async function (guild, user) {
-    let logchannel = guild.channels.cache.get(logChannelID);
-    if (!logchannel) return;
+   let logchannel = guild.channels.cache.get(logChannelID);
+   if (!logchannel) return;
  
-    guild.fetchAuditLogs()
-        .then(audit => {
-            const modEmbed = new Discord.MessageEmbed()
-                .setColor('#32CD32')
-                .setTitle("Unban")
-                .addField("User unbanned:", user.tag, true)
-                .addField("Reason:", audit.entries.first().reason, true)
-                .setTimestamp()
-                .setFooter(`User ID: ${user.id}`)
-            logchannel.send(modEmbed);
-        });
+   guild.fetchAuditLogs()
+       .then(audit => {
+           const modEmbed = new Discord.MessageEmbed()
+               .setColor('#32CD32')
+               .setTitle("Unban")
+               .addField("User unbanned:", user.tag, true)
+               .addField("Reason:", audit.entries.first().reason, true)
+               .setTimestamp()
+               .setFooter(`User ID: ${user.id}`)
+           logchannel.send(modEmbed);
+       });
 })
  
 //deleted channel
 client.on('channelDelete', channel => {
-    if (channel.type === 'dm') return;
-    let logchannel = channel.guild.channels.cache.get(logChannelID);
-    if (!logchannel) return;
+   if (channel.type === 'dm') return;
+   let logchannel = channel.guild.channels.cache.get(logChannelID);
+   if (!logchannel) return;
  
-    channel.guild.fetchAuditLogs()
-        .then(audit => {
-            const modEmbed = new Discord.MessageEmbed()
-                .setColor('#ff0000')
-                .setTitle("Channel Deleted")
-                .addField("Channel:", channel.name, true)
-                .addField("Category:", channel.parent, true)
-                .addField("User:", audit.entries.first().executor, true)
-                .setTimestamp()
-            logchannel.send(modEmbed);
-        });
+   channel.guild.fetchAuditLogs()
+       .then(audit => {
+           const modEmbed = new Discord.MessageEmbed()
+               .setColor('#ff0000')
+               .setTitle("Channel Deleted")
+               .addField("Channel:", channel.name, true)
+               .addField("Category:", channel.parent, true)
+               .addField("User:", audit.entries.first().executor, true)
+               .setTimestamp()
+           logchannel.send(modEmbed);
+       });
 }) */
 
 client.login(token);

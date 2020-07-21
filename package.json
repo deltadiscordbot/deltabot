@@ -1,6 +1,6 @@
 {
   "name": "delta-bot",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "The only bot playing Delta.",
   "main": "index.js",
   "dependencies": {
@@ -25,9 +25,7 @@
     "ytdl-core": "^2.1.7"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "author": "jimmy#9999",
   "license": "ISC"
 }
