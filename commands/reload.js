@@ -15,6 +15,7 @@ module.exports = {
 				// with the key as the command name and the value as the exported module
 				message.client.commands.set(command.name, command);
 			}
+
 			message.client.commands.forEach(async element => {
 				currentCommand = await message.client.commands.get(element.name)
 				delete require.cache[require.resolve(`./${currentCommand.name}.js`)];

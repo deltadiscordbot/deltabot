@@ -18,6 +18,7 @@ module.exports = {
         let funString = '';
         let ecoString = '';
         let musicString = '';
+        let ownerString = '';
         if (!args.length) {
             for (let elem of commands.entries()) {
                 switch (elem[1].category) {
@@ -25,8 +26,10 @@ module.exports = {
                         modString = modString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
                         break;
                     case "admin":
-                    case "owner":
                         adminString = adminString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
+                        break;
+                    case "owner":
+                        ownerString = ownerString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
                         break;
                     case "fun":
                         funString = funString + `\`${prefix}` + elem[1].name + "` - " + elem[1].description + "\n";
@@ -42,7 +45,9 @@ module.exports = {
                         break;
                 }
             }
-            adminString = adminString + `\n\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`;
+            ownerString = ownerString + `\n\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`;
+
+            //TODO: Create multipage help command to fix embed limits.
 
             const helpEmbed = new Discord.MessageEmbed()
                 .setColor('#8A28F7')
@@ -53,6 +58,7 @@ module.exports = {
                 .addField("Economy commands:", ecoString)
                 .addField("Mod commands:", modString)
                 .addField("Admin commands:", adminString)
+                .addField("Owner commands:", ownerString)
                 .setTimestamp()
                 .setFooter(package.name + ' v. ' + package.version);
 
@@ -61,10 +67,10 @@ module.exports = {
             return message.author.send(helpEmbed)
                 .then(() => {
                     if (message.channel.type === 'dm') return;
-                    message.reply('I\'ve sent you a DM with all my commands!');
+                    message.react('✅');
                 })
                 .catch(error => {
-                    console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
+                    console.log(error)
                     message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
                 });
         }

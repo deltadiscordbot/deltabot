@@ -12,6 +12,11 @@ module.exports = {
   guildOnly: true,
   async execute(message, args) {
     if (args.length) {
+      try {
+        setToChannel = message.mentions.channels.first().id;
+      } catch (error) {
+        message.reply("please mention a valid channel.")
+      }
       setToChannel = message.mentions.channels.first().id;
       const items = await message.client.dbInstance.collection('config').findOne({});
       currentAnnounceChannels = items.announcechannel;
