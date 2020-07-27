@@ -1,5 +1,4 @@
 const package = require('../package.json');
-const Discord = require('discord.js');
 module.exports = {
     name: 'uptime',
     description: `Uptime of ${package.name}.`,
@@ -17,7 +16,7 @@ module.exports = {
         const formattedMinutes = ("0" + minutes).slice(-2);
         const formattedSeconds = ("0" + seconds).slice(-2);
 
-        const uptime = `${days}:${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+        const uptime = `${Math.abs(days) >= 1 ? `${days} ${Math.abs(days) == 1 ? `day` : "days"},` : ""} ${(Math.abs(formattedHours) || Math.abs(days)) >= 1 ? `${formattedHours} ${Math.abs(formattedHours) == 1 ? `hour` : "hours"},` : ""} ${Math.abs(formattedMinutes) == 1 ? `${formattedMinutes} minute` : `${formattedMinutes} minutes`}, ${Math.abs(formattedSeconds) == 1 ? `${formattedSeconds} second` : `${formattedSeconds} seconds`}`;
         message.reply(uptime)
     },
 };
