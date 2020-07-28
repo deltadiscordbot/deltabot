@@ -20,34 +20,85 @@ module.exports = {
                     json['apps'].forEach(element => {
                         sourceApps.push(element)
                     });
-                    embedInfo = "";
-                    index = 1;
-                    sourceApps.forEach(element => {
-                        if (element['beta']) {
-                            embedInfo += `${index}. [**${element['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${element['downloadURL']}) *beta* ${element['version']} \n`
+                    embedInfo = [];
+                    embedInfo[0] = '';
+                    embedIndex = 0, embedLength = 0, totalapps = 1;
+                    for (let index = 0; index < sourceApps.length; index++) {
+                        if (sourceApps[index]['beta']) {
+                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) *beta* ${sourceApps[index]['version']} \n`
                         } else {
-                            embedInfo += `${index}. [**${element['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${element['downloadURL']}) ${element['version']} \n`
+                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) ${sourceApps[index]['version']} \n`
                         }
-                        index++;
-                    });
-                    const appListEmbed = new Discord.MessageEmbed()
-                        .setTitle(json.name)
-                        .setURL(args[0])
-                        .setDescription(embedInfo.substring(0, 2048))
-                        .setTimestamp()
-                        .setFooter('Requested by: ' + message.author.tag);
+                        totalapps++;
+                        embedLength++;
+                        if (embedLength >= 10) {
+                            embedLength = 0;
+                            embedIndex++;
+                            embedInfo[embedIndex] = '';
+                        }
+                    }
+                    let appListEmbedArray = [];
+                    for (let index = 0; index < embedInfo.length; index++) {
+                        appListEmbedArray[index] = new Discord.MessageEmbed()
+                            .setTitle(json.name)
+                            .setURL(args[0])
+                            .setDescription(embedInfo[index].substring(0, 2048))
+                            .setTimestamp()
+                            .setFooter('Type a number to view app info');
+                    }
+
                     let sourceAppsLength = [];
                     index = 1;
                     sourceApps.forEach(element => {
                         sourceAppsLength.push(index);
                         index++;
                     });
-                    message.channel.send(appListEmbed).then((msg => {
-                        msg.react("⌛")
+                    let activeIndex = 0;
+                    message.channel.send(appListEmbedArray[activeIndex]).then((msg => {
+                        msg.react("◀️");
+                        msg.react("▶️");
+                        const backwardsFilter = (reaction, user) => reaction.emoji.name === '◀️' && user.id === message.author.id;
+                        const forwardsFilter = (reaction, user) => reaction.emoji.name === '▶️' && user.id === message.author.id;
+                        const backwards = msg.createReactionCollector(backwardsFilter, { timer: 1000, idle: 15000, dispose: true });
+                        const forwards = msg.createReactionCollector(forwardsFilter, { timer: 1000, idle: 15000, dispose: true });
+                        backwards.on('collect', r => {
+                            if (activeIndex == 0) {
+                                activeIndex = (appListEmbedArray.length - 1);
+                            } else {
+                                activeIndex--
+                            }
+                            msg.edit(appListEmbedArray[activeIndex])
+                            const userReactions = msg.reactions.cache.filter(reaction => reaction.users.cache.has(message.author.id));
+                            try {
+                                for (const reaction of userReactions.values()) {
+                                    reaction.users.remove(message.author.id);
+                                }
+                            } catch (error) {
+                                console.error('Failed to remove reactions.');
+                            }
+                        })
+
+                        forwards.on('collect', r => {
+                            if (activeIndex === (appListEmbedArray.length - 1)) {
+                                activeIndex = 0;
+                            } else {
+                                activeIndex++;
+                            }
+                            msg.edit(appListEmbedArray[activeIndex])
+
+                            const userReactions = msg.reactions.cache.filter(reaction => reaction.users.cache.has(message.author.id));
+                            try {
+                                for (const reaction of userReactions.values()) {
+                                    reaction.users.remove(message.author.id);
+                                }
+                            } catch (error) {
+                                console.error('Failed to remove reactions.');
+                            }
+                        })
+
                         const collector = message.channel.createMessageCollector(m => (sourceAppsLength.includes(parseInt(m.content)) && m.author.id == message.author.id), { time: 15000 });
                         collector.on('collect', m => {
                             m.delete();
-                            console.log(m)
                             const selcetedApp = json['apps'][(parseInt(m) - 1)];
                             function formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
                             collector.resetTimer()
@@ -65,18 +116,18 @@ module.exports = {
                                 .setTimestamp()
                                 .setFooter('Requested by: ' + message.author.tag);
                             msg.edit(selectedAppEmbed).then((msg2 => {
-                                const backwardsFilter = (reaction, user) => reaction.emoji.name === '◀️' && user.id === message.author.id;
-                                const backwards = msg.createReactionCollector(backwardsFilter, { timer: 1000, idle: 10000, dispose: true });
+                                const backwardsFilter = (reaction, user) => reaction.emoji.name === '⏪' && user.id === message.author.id;
+                                const goBack = msg.createReactionCollector(backwardsFilter, { timer: 1000, idle: 30000, dispose: true });
 
-                                msg.reactions.removeAll();
-                                msg.react("◀️")
-                                backwards.on('collect', r => {
+                                msg.reactions.removeAll().then(msg.react("⏪"));
+                                goBack.on('collect', r => {
                                     collector.resetTimer()
-                                    msg.edit(appListEmbed);
+                                    msg.edit(appListEmbedArray[activeIndex]);
                                     msg.reactions.removeAll();
-                                    msg.react("⌛")
+                                    msg.react("◀️");
+                                    msg.react("▶️");
                                 });
-                                backwards.on('end'), e => {
+                                goBack.on('end'), e => {
                                     msg.reactions.removeAll();
                                 }
                             }));

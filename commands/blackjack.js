@@ -53,7 +53,7 @@ module.exports = {
                 const cardBack = "<:cardback:716320555346821160>";
                 let dealersHand, playerHand, cardValue;
                 let playerValues = 0, dealerValues = 0;
-                let hasAce = false;;
+                let hasAce = false;
                 let bust = false;
                 function randomCard() {
                     return `${[Math.floor(Math.random() * cards.length)]}`
