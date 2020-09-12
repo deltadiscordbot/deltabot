@@ -8,8 +8,10 @@ module.exports = {
     needsmod: true,
     async execute(message, args2, queue) {
         serverQueue = queue.get(message.guild.id);
-        serverQueue.songs = [];
-        serverQueue.connection.dispatcher.end();
+        if (serverQueue != undefined) {
+            serverQueue.songs = [];
+            serverQueue.connection.dispatcher.end();
+        }
         message.member.voice.channel.leave();
         message.channel.send(
             "Bot has left!"

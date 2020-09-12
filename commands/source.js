@@ -21,13 +21,15 @@ module.exports = {
                         sourceApps.push(element)
                     });
                     embedInfo = [];
+                    var currentDate;
                     embedInfo[0] = '';
                     embedIndex = 0, embedLength = 0, totalapps = 1;
                     for (let index = 0; index < sourceApps.length; index++) {
+                        currentDate = new Date(sourceApps[index]['versionDate']);
                         if (sourceApps[index]['beta']) {
-                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) *beta* ${sourceApps[index]['version']} \n`
+                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) *beta* ${sourceApps[index]['version']}\n`
                         } else {
-                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) ${sourceApps[index]['version']} \n`
+                            embedInfo[embedIndex] += `${totalapps}. [**${sourceApps[index]['name']}**](https://delta-skins.github.io/appinstall.html?altstore://install?url=${sourceApps[index]['downloadURL']}) ${sourceApps[index]['version']}\n`
                         }
                         totalapps++;
                         embedLength++;
@@ -38,13 +40,13 @@ module.exports = {
                         }
                     }
                     let appListEmbedArray = [];
+                    let activeIndex = 0;
                     for (let index = 0; index < embedInfo.length; index++) {
                         appListEmbedArray[index] = new Discord.MessageEmbed()
                             .setTitle(json.name)
                             .setURL(args[0])
                             .setDescription(embedInfo[index].substring(0, 2048))
-                            .setTimestamp()
-                            .setFooter('Type a number to view app info');
+                            .setFooter(`Type a number to view app info | Page ${index + 1}/${embedInfo.length}`);
                     }
 
                     let sourceAppsLength = [];
@@ -53,8 +55,7 @@ module.exports = {
                         sourceAppsLength.push(index);
                         index++;
                     });
-                    let activeIndex = 0;
-                    message.channel.send(appListEmbedArray[activeIndex]).then((msg => {
+                    message.channel.send(appListEmbedArray[activeIndex]).then((async msg => {
                         msg.react("◀️");
                         msg.react("▶️");
                         const backwardsFilter = (reaction, user) => reaction.emoji.name === '◀️' && user.id === message.author.id;
@@ -78,7 +79,7 @@ module.exports = {
                             }
                         })
 
-                        forwards.on('collect', r => {
+                        forwards.on('collect', async r => {
                             if (activeIndex === (appListEmbedArray.length - 1)) {
                                 activeIndex = 0;
                             } else {
@@ -97,9 +98,10 @@ module.exports = {
                         })
 
                         const collector = message.channel.createMessageCollector(m => (sourceAppsLength.includes(parseInt(m.content)) && m.author.id == message.author.id), { time: 15000 });
-                        collector.on('collect', m => {
+                        collector.on('collect', async m => {
                             m.delete();
                             const selcetedApp = json['apps'][(parseInt(m) - 1)];
+                            const appDate = await new Date(selcetedApp.versionDate.toString());
                             function formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
                             collector.resetTimer()
                             const selectedAppEmbed = new Discord.MessageEmbed()
@@ -109,6 +111,7 @@ module.exports = {
                                 .setThumbnail(selcetedApp.iconURL)
                                 .setDescription(selcetedApp.localizedDescription.substring(0, 2048))
                                 .addField("Version:", selcetedApp.version, true)
+                                .addField("Updated:", `${(appDate.getMonth() + 1)}/${appDate.getDate()}/${appDate.getFullYear()}`, true)
                                 .addField("Size:", formatBytes(selcetedApp.size), true)
                                 .addField("Download:", `[Direct install](https://delta-skins.github.io/appinstall.html?altstore://install?url=${selcetedApp.downloadURL})\n[Download IPA](${selcetedApp.downloadURL})`, true)
                                 .addField("What's new:", selcetedApp.versionDescription.substring(0, 1024))

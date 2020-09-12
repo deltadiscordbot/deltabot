@@ -629,7 +629,10 @@ client.on('message', async message => {
     }
     if (parseFloat(result["intentDetectionConfidence"]) > .70 && result["fulfillmentText"].length > 1) {
         const items = await client.dbInstance.collection("tags").findOne({ name: result["fulfillmentText"].toString() });
-        if (items != null) message.channel.send(eval('`' + items.content + '`'));
+        if (items != null) {
+            const lastAIMessage = await message.channel.send(eval('`' + items.content + '`'));
+            client.AI = lastAIMessage.url;
+        }
     }
 })
 

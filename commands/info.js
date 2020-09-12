@@ -15,11 +15,9 @@ module.exports = {
         totalSeconds %= 3600;
         let minutes = `${Math.floor(totalSeconds / 60)}`;
         let seconds = Math.floor(totalSeconds % 60);
-        console.log(hours)
         const formattedHours = ("0" + hours).slice(-2);
         const formattedMinutes = ("0" + minutes).slice(-2);
         const formattedSeconds = ("0" + seconds).slice(-2);
-        console.log(`${formattedHours} + ${formattedMinutes} + ${formattedSeconds}`)
         const uptime = `${Math.abs(days) >= 1 ? `${days} ${Math.abs(days) == 1 ? `day` : "days"},` : ""} ${(Math.abs(formattedHours) || Math.abs(days)) >= 1 ? `${formattedHours} ${Math.abs(formattedHours) == 1 ? `hour` : "hours"},` : ""} ${Math.abs(formattedMinutes) == 1 ? `${formattedMinutes} minute` : `${formattedMinutes} minutes`}, ${Math.abs(formattedSeconds) == 1 ? `${formattedSeconds} second` : `${formattedSeconds} seconds`}`;
 
         const infoEmbed = new Discord.MessageEmbed()

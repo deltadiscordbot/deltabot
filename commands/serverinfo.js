@@ -26,7 +26,6 @@ module.exports = {
         serverEmojiArray[0] += `${serverEmoji[index].toString()} `;
       }
     }
-    console.log(serverEmojiArray)
     fields.push({ name: "Emoji:", value: serverEmojiArray[0].toString().substring(0, 1024), inline: false })
     if (serverEmojiArray[1].length > 0) {
       fields.push({ name: "Emoji cont.", value: serverEmojiArray[1].toString().substring(0, 1024), inline: true })
