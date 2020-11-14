@@ -358,7 +358,6 @@ const deltaDiscordID = "625714187078860810", altstoreDiscordID = "62576689623033
 let deltaDiscord, altstoreDiscord, deltaRoleChannel, altstoreRoleChannel;
 
 client.once('ready', async () => {
-
     databaseClient = await MongoClient.connect(mongodbase, {
         useUnifiedTopology: true,
     });
