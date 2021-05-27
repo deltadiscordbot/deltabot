@@ -2,8 +2,7 @@ const Discord = require('discord.js');
 const deltaDiscordID = "625714187078860810", altstoreDiscordID = "625766896230334465";
 const cooldowns = new Discord.Collection();
 
-module.exports = async (client, message) => {
-    client.on('guildMemberUpdate', async member => {
+module.exports = async (client, member) => {
         if (member.guild.id == deltaDiscordID) {
             let deltaMember, role;
             async () => {
@@ -45,5 +44,4 @@ module.exports = async (client, message) => {
 
             }
         }
-    });
 };
