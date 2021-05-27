@@ -7,14 +7,14 @@ module.exports = {
   aliases: ['server', 'guildinfo', 'guild'],
   async execute(message, args) {
     let fields = [];
-    fields.push({ name: "Owner:", value: message.guild.owner.toString().substring(0, 1024), inline: true })
+    //fields.push({ name: "Owner:", value: message.guild.owner.toString().substring(0, 1024), inline: true })
     const serverCreated = message.guild.createdAt.toDateString() + ", " + message.guild.createdAt.toLocaleTimeString('en-US');
     fields.push({ name: "Created:", value: serverCreated.toString().substring(0, 1024), inline: true })
     fields.push({ name: "Region:", value: message.guild.region.toString().substring(0, 1024), inline: true })
     fields.push({ name: "Members:", value: message.guild.memberCount.toString().substring(0, 1024), inline: true })
     fields.push({ name: "Channels:", value: message.guild.channels.cache.size.toString().substring(0, 1024), inline: true })
     fields.push({ name: "Roles:", value: message.guild.roles.cache.size.toString().substring(0, 1024), inline: true })
-    const serverEmoji = message.guild.emojis.cache.map(emoji => emoji);
+    /*const serverEmoji = message.guild.emojis.cache.map(emoji => emoji);
     let currentStringLength = 0;
     let serverEmojiArray = [];
     serverEmojiArray[0] = '', serverEmojiArray[1] = '';
@@ -29,7 +29,7 @@ module.exports = {
     fields.push({ name: "Emoji:", value: serverEmojiArray[0].toString().substring(0, 1024), inline: false })
     if (serverEmojiArray[1].length > 0) {
       fields.push({ name: "Emoji cont.", value: serverEmojiArray[1].toString().substring(0, 1024), inline: true })
-    }
+    }*/
     if (message.guild.id != "625766896230334465") {
       const inviteLink = await message.guild.fetchInvites()
       if (inviteLink.first() != undefined) {

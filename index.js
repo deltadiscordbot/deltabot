@@ -4,7 +4,7 @@ const fs = require('fs');
 const queue = new Map();
 let { prefix } = require('./config.json');
 client.prefix = prefix;
-const { projectId, mainSourceURL, alphaSourceURL, ownerID, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, numbers, computers, devices, versions, altstoreAlerts, deltaAlerts } = require('./config.json');
+const { projectId, mainSourceURL, alphaSourceURL, ownerID, versionsEmotes, jailbrokenEmotes, experienceEmotes, computers, computersEmotes, versions, jailbroken, experience, collaborating, collaboratingEmotes, devices, devicesEmotes, /*twitterAPIKey, twitterAPISecret, twitterAccessSecret, twitterAccessToken,*/ token, mongodbase, currentdb, altstoreAlerts, deltaAlerts } = require('./config.json');
 const dialogflow = require('@google-cloud/dialogflow');
 const package = require('./package.json');
 const MongoClient = require('mongodb').MongoClient;
@@ -373,23 +373,35 @@ client.once('ready', async () => {
 });
 
 function initReactionRoles() {
-    deltaRoleChannel = client.channels.cache.get("719296628904951819");
-    deltaRoleChannel.messages.fetch("719312071992279242") //computers in delta
+    deltaRoleChannel = client.channels.cache.get("847520642181234709");
+    deltaRoleChannel.messages.fetch("847569031283605574") //computers in delta
         .then(computerMessage => {
-            createRR(computerMessage, computers);
+            createRR(computerMessage, computers, computersEmotes);
         });
-    deltaRoleChannel.messages.fetch("719312073040855061") //versions in delta
+    deltaRoleChannel.messages.fetch("847568066228256809") //versions in delta
         .then(versionMessage => {
-            createRR(versionMessage, versions);
+            createRR(versionMessage, versions, versionsEmotes);
         });
-    deltaRoleChannel.messages.fetch("719312126702780516") //devices in delta
+    deltaRoleChannel.messages.fetch("847569273932480602") //devices in delta
         .then(deviceMessage => {
-            createRR(deviceMessage, devices);
+            createRR(deviceMessage, devices, devicesEmotes);
         });
-    /* deltaRoleChannel.messages.fetch("722562577669816431") //alerts in delta
+    deltaRoleChannel.messages.fetch("847568473353224194") //jailbroken in delta
+        .then(jailbrokenMsg => {
+            createRR(jailbrokenMsg, jailbroken, jailbrokenEmotes);
+        });
+    deltaRoleChannel.messages.fetch("847568723883327518") //experience in delta
+        .then(experienceMsg => {
+            createRR(experienceMsg, experience, experienceEmotes);
+        });
+    deltaRoleChannel.messages.fetch("847568853961408522") //collab in delta
+        .then(collaboratingMsg => {
+            createRR(collaboratingMsg, collaborating, collaboratingEmotes);
+        });/*
+     deltaRoleChannel.messages.fetch("722562577669816431") //alerts in delta
         .then(alertsMessage => {
             createRR(alertsMessage, deltaAlerts);
-        }); */
+        }); 
 
     altstoreRoleChannel = client.channels.cache.get("719294939451621377");
     altstoreRoleChannel.messages.fetch("719296388311285861") //computers in altstore
@@ -407,16 +419,10 @@ function initReactionRoles() {
     altstoreRoleChannel.messages.fetch("722562517901115494") //alerts in altstore
         .then(alertsMessage => {
             createRR(alertsMessage, altstoreAlerts);
-        });
+        });*/
 }
-function createRR(message, array) {
-    let embedBody = "";
-    for (let index = 0; index < array.length; index++) {
-        embedBody += `${numbers[index]} ${array[index]}\n\n`
-    }
-    let currentEmbed = new Discord.MessageEmbed()
-        .setDescription(embedBody);
-    message.edit(currentEmbed)
+function createRR(message, array, emotesList) {
+    const numbers = emotesList;
     let currentFilter = [];
     let currentCollector = [];
     for (let index = 0; index < array.length; index++) {
@@ -724,17 +730,13 @@ client.on('guildBanAdd', async function (guild, user) {
 })
  */
 //leave log
+/*
 client.on('guildMemberRemove', async member => {
-    const user = await client.dbInstance.collection("alerts").findOne({ id: member.id });
-    if (user != null) {
-        var myquery = { id: member.id };
-        client.dbInstance.collection("alerts").deleteOne(myquery, function (err, obj) {
-            if (err) throw err;
-        });
 
-    }
 
-    /*// Send the message to a designated channel on a server:
+
+
+    // Send the message to a designated channel on a server:
     let logchannel = member.guild.channels.cache.get(logChannelID);
     // Do nothing if the channel wasn't found on this server
     if (!logchannel) return;
@@ -748,8 +750,8 @@ client.on('guildMemberRemove', async member => {
         .setTimestamp()
         .setFooter(`User ID: ${member.user.id}`)
     logchannel.send(modEmbed);
-    */
-});
+   
+}); */
 /*
 //unbanned member
 client.on('guildBanRemove', async function (guild, user) {
