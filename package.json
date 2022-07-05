@@ -4,7 +4,7 @@
   "description": "The only bot playing Delta.",
   "main": "index.js",
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
+    "@discordjs/opus": "^0.8.0",
     "@google-cloud/dialogflow": "^2.0.0",
     "@pm2/io": "^4.3.5",
     "canvas": "^2.6.1",
