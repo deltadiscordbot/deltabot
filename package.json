@@ -6,7 +6,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
     "@google-cloud/dialogflow": "^2.0.0",
-    "@pm2/io": "^4.3.5",
+    "@pm2/io": "^5.0.0",
     "canvas": "^2.6.1",
     "discord.js": "^12.2.0",
     "ffmpeg": "0.0.4",
@@ -17,7 +17,7 @@
     "mongodb": "^3.5.9",
     "node-fetch": "^2.6.1",
     "node-server-screenshot": "^0.2.4",
-    "pm2": "^4.4.0",
+    "pm2": "^5.2.0",
     "simple-youtube-api": "^5.2.1",
     "snoowrap": "^1.21.0",
     "translate": "^1.1.2",
