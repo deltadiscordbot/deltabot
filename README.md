@@ -1,7 +1,6 @@
-# deltabot
+# AltBot
+A Discord bot for Delta emulator and AltStore Discord servers.
 
-A Discord bot for Delta emulator and AltStore discord servers.
+Written in: Discord.js
 
-Written using Discord.js.
-
-Pull requests accepted.
+Submit a PR or open a ticket if me to add something to the bot.
